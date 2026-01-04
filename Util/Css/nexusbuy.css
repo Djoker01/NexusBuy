@@ -2041,3 +2041,223 @@ a:hover {
   }
 }
 
+/* ========== AJUSTES PARA CENTRO DE AYUDA ========== */
+.card-categoria-ayuda {
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.card-categoria-ayuda:hover {
+    text-decoration: none;
+    color: inherit;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(67, 97, 238, 0.15);
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* FAQ Styles */
+.faq-item .card-header {
+    background-color: rgba(67, 97, 238, 0.05);
+    border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+    padding: 15px;
+}
+
+.faq-item .btn-link {
+    color: var(--dark);
+    font-weight: 500;
+    text-decoration: none;
+    width: 100%;
+    text-align: left;
+    padding: 0;
+}
+
+.faq-item .btn-link:hover {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.faq-item .collapse.show {
+    background-color: #f8f9fa;
+    border-left: 3px solid var(--primary);
+}
+
+/* Busqueda en soporte */
+#buscarAyuda:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+/* Menu lateral activo en soporte */
+.list-group-item.active {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border-color: var(--primary);
+}
+
+.list-group-item.active i {
+    color: white !important;
+}
+
+/* ========== AJUSTES PARA FOOTER ========== */
+.main-footer {
+    background: var(--gradient-primary) !important;
+    margin-top: auto;
+}
+
+.footer-link {
+    transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+    color: white !important;
+    transform: translateX(5px);
+    text-decoration: none !important;
+}
+
+/* ========== AJUSTES PARA PAGINACIÓN ========== */
+.pagination-modern .page-link {
+    color: var(--primary);
+    border: 1px solid #dee2e6;
+    margin: 0 3px;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition);
+}
+
+.pagination-modern .page-link:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.pagination-modern .page-item.active .page-link {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: 600;
+}
+
+/* ========== AJUSTES PARA PRODUCTOS ========== */
+.product-card {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.product-card:hover {
+    border-color: var(--primary);
+}
+
+.product-image {
+    background: #f8f9fa;
+    border-radius: var(--border-radius-sm);
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+@media (max-width: 768px) {
+    .card-categoria-ayuda {
+        margin-bottom: 15px;
+    }
+    
+    .faq-item .btn-link {
+        font-size: 0.95rem;
+    }
+    
+    .content-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .section-title h2 {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-image {
+        height: 150px;
+    }
+    
+    .current-price {
+        font-size: 1.1rem;
+    }
+    
+    .promo-slider {
+        height: 300px;
+    }
+    
+    .slide h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ========== ANIMACIONES ADICIONALES ========== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+}
+
+.pulse-animation {
+    animation: pulse 1s ease-in-out;
+}
+
+/* ========== ESTILOS PARA FORMULARIOS ========== */
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+/* ========== COLORES DE ALERTAS ========== */
+.alert-info {
+    background-color: rgba(76, 201, 240, 0.1);
+    border-color: var(--accent);
+    color: #155724;
+}
+
+.alert-success {
+    background-color: rgba(75, 181, 67, 0.1);
+    border-color: var(--success);
+    color: #155724;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: var(--warning);
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: rgba(230, 57, 70, 0.1);
+    border-color: var(--danger);
+    color: #721c24;
+}
