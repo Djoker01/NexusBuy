@@ -38,7 +38,7 @@
             <li class="mb-2"><a href="Views/producto.php" class="text-white-50" data-section="Productos" style="text-decoration: none;">Productos</a></li>
             <li class="mb-2"><a href="Views/ofertas.php" class="text-white-50" data-section="Ofertas" style="text-decoration: none;">Ofertas</a></li>
             <li class="mb-2"><a href="Views/producto.php?filtro=nuevos" class="text-white-50" data-section="Nuevos Productos" style="text-decoration: none;">Nuevos</a></li>
-            <li class="mb-2"><a href="Views/soporte.php?filtro=contacto" class="text-white-50 footer-link en-desarrollo" data-section="Contacto" style="text-decoration: none;">Contacto</a></li>
+            <li class="mb-2"><a href="Views/soporte.php?filtro=contacto" class="text-white-50" data-section="Contacto" style="text-decoration: none;">Contacto</a></li>
           </ul>
         </div>
 
@@ -46,11 +46,11 @@
         <div class="col-lg-3 col-md-6 mb-4">
           <h5 class="font-weight-bold mb-3">Servicio al Cliente</h5>
           <ul class="list-unstyled">
-            <li class="mb-2"><a href="Views/soporte.php?filtro=centro_ayuda" class="text-white-50 footer-link en-desarrollo" data-section="Centro de Ayuda" style="text-decoration: none;">Centro de Ayuda</a></li>
-            <li class="mb-2"><a href="Views/soporte.php?filtro=metodos_pago" class="text-white-50 footer-link en-desarrollo" data-section="Métodos de Pago" style="text-decoration: none;">Métodos de Pago</a></li>
-            <li class="mb-2"><a href="Views/soporte.php?filtro=envios_entregas" class="text-white-50 footer-link en-desarrollo" data-section="Envíos y Entregas" style="text-decoration: none;">Envíos y Entregas</a></li>
-            <li class="mb-2"><a href="Views/soporte.php?filtro=devoluciones" class="text-white-50 footer-link en-desarrollo" data-section="Devoluciones" style="text-decoration: none;">Devoluciones</a></li>
-            <li class="mb-2"><a href="Views/soporte.php?filtro=terminos_condiciones" class="text-white-50 footer-link en-desarrollo" data-section="Términos y Condiciones" style="text-decoration: none;">Términos y Condiciones</a></li>
+            <li class="mb-2"><a href="Views/soporte.php?filtro=centro_ayuda" class="text-white-50" data-section="Centro de Ayuda" style="text-decoration: none;">Centro de Ayuda</a></li>
+            <li class="mb-2"><a href="Views/soporte.php?filtro=metodos_pago" class="text-white-50" data-section="Métodos de Pago" style="text-decoration: none;">Métodos de Pago</a></li>
+            <li class="mb-2"><a href="Views/soporte.php?filtro=envios_entregas" class="text-white-50" data-section="Envíos y Entregas" style="text-decoration: none;">Envíos y Entregas</a></li>
+            <li class="mb-2"><a href="Views/soporte.php?filtro=devoluciones" class="text-white-50" data-section="Devoluciones" style="text-decoration: none;">Devoluciones</a></li>
+            <li class="mb-2"><a href="Views/soporte.php?filtro=terminos_condiciones" class="text-white-50" data-section="Términos y Condiciones" style="text-decoration: none;">Términos y Condiciones</a></li>
           </ul>
         </div>
 
