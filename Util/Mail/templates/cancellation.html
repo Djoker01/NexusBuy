@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="greeting">Hola {{user_name}},</div>
+
+<div class="message">
+    <p>Hemos procesado la cancelación de tu suscripción a las ofertas de NexusBuy.</p>
+    
+    <p>Lamentamos verte ir y esperamos que hayas disfrutado de nuestras ofertas mientras fuiste parte de nuestra comunidad.</p>
+</div>
+
+<div class="message">
+    <h3>📝 Resumen de tu suscripción:</h3>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <strong>Fecha de suscripción:</strong><br>
+                {{subscription_date}}
+            </div>
+            <div>
+                <strong>Fecha de cancelación:</strong><br>
+                {{cancellation_date}}
+            </div>
+            <div>
+                <strong>Frecuencia:</strong><br>
+                {{frequency}}
+            </div>
+            <div>
+                <strong>Emails recibidos:</strong><br>
+                {{emails_received}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="message">
+    <p><strong>¿Qué pasa ahora?</strong></p>
+    <ul>
+        <li>No recibirás más emails de ofertas de NexusBuy</li>
+        <li>Tus datos serán eliminados en 30 días (cumpliendo con GDPR)</li>
+        <li>Puedes volver a suscribirte en cualquier momento</li>
+    </ul>
+</div>
+
+<div class="button-container">
+    <a href="{{feedback_url}}" class="btn btn-secondary">Compartir tu experiencia</a>
+</div>
+
+<div class="message">
+    <div class="alert alert-info">
+        <p><strong>💡 ¿Fue un error?</strong> Si cancelaste por error, puedes volver a suscribirte haciendo clic en el siguiente botón:</p>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="{{resubscribe_url}}" class="btn" style="background: #28a745;">Volver a Suscribirme</a>
+        </div>
+    </div>
+</div>
+
+<div class="message">
+    <p>Gracias por haber sido parte de NexusBuy. Te deseamos lo mejor en tus futuras compras.</p>
+    
+    <p>Atentamente,<br>
+    <strong>El equipo de NexusBuy</strong></p>
+</div>
+{% endblock %}
+
+{% block subject %}Confirmación de cancelación de suscripción{% endblock %}
