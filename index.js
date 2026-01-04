@@ -9,6 +9,8 @@ $(document).ready(function () {
     
     // Llamar a marcas con paginación (solo una vez)
     marcas(1, 30); // Aqui se determina el Limite
+
+    cargarOfertasFlash();
     
     // Event delegation para la paginación de marcas
     $(document).on('click', '.pagination-marcas .page-link[data-pagina]', function(e) {
@@ -114,7 +116,7 @@ $(document).ready(function () {
                 body: new URLSearchParams({
                     funcion: funcion,
                     solo_destacados: true,
-                    limite: 15,
+                    limite: 18,
                 }).toString(),
             });
             let response = await data.text();
@@ -600,4 +602,217 @@ $(document).ready(function () {
         // Usar el nombre de la subcategoría en la URL
         window.location.href = `Views/producto.php?subcategoria=${encodeURIComponent(nombre_subcategoria)}`;
     }
+
+    // ==============================
+// CARGAR OFERTAS FLASH - CORREGIDO
+// ==============================
+
+function cargarOfertasFlash() {
+    console.log("Solicitando ofertas flash...");
+    
+    $.ajax({
+        url: "Controllers/OfertasController.php",
+        method: "POST",
+        data: {
+            funcion: "obtener_ofertas_flash",
+            tipo: "todas",
+            limite: 6  // Prueba con menos primero
+        },
+        success: function(response) {
+            console.log("Respuesta recibida:", response);
+            
+            // INTENTA 3 FORMAS DIFERENTES DE PROCESAR LA RESPUESTA
+            let ofertas;
+            
+            // 1. Si ya es un objeto (el caso de tu error)
+            if (typeof response === 'object') {
+                console.log("La respuesta YA ES un objeto");
+                ofertas = response;
+            }
+            // 2. Si es un string JSON
+            else if (typeof response === 'string') {
+                try {
+                    ofertas = JSON.parse(response);
+                    console.log("Parseado de JSON exitoso");
+                } catch (e) {
+                    console.error("No es JSON válido. Contenido:", response);
+                    mostrarErrorOfertas("Formato de respuesta inválido");
+                    return;
+                }
+            }
+            // 3. Otro caso
+            else {
+                console.error("Tipo de respuesta desconocido:", typeof response);
+                mostrarErrorOfertas("Error en la respuesta");
+                return;
+            }
+            
+            // Verificar estructura
+            if (!ofertas || (Array.isArray(ofertas) && ofertas.length === 0)) {
+                console.warn("No hay ofertas o array vacío");
+                mostrarSinOfertas();
+                return;
+            }
+            
+            // Si llegó aquí, mostrar ofertas
+            mostrarOfertas(ofertas);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error AJAX:", status, error);
+            console.log("Detalles XHR:", xhr);
+            mostrarErrorOfertas("Error de conexión: " + status);
+        }
+    });
+}
+
+function mostrarErrorOfertas(mensaje) {
+    $("#ofertas-flash-container").html(`
+        <div class="col-12 text-center py-4">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                ${mensaje}
+                <button class="btn btn-sm btn-outline-warning ms-2" onclick="cargarOfertasFlash()">
+                    Reintentar
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+function mostrarSinOfertas() {
+    $("#ofertas-flash-container").html(`
+        <div class="col-12 text-center py-4">
+            <p class="text-muted">
+                <i class="fas fa-info-circle"></i>
+                No hay ofertas flash en este momento
+            </p>
+        </div>
+    `);
+}
+
+function mostrarOfertas(ofertas) {
+    console.log("Mostrando ofertas:", ofertas);
+    
+    // Asegurar que sea array
+    if (!Array.isArray(ofertas)) {
+        console.error("ofertas no es un array:", ofertas);
+        mostrarErrorOfertas("Formato de datos incorrecto");
+        return;
+    }
+    
+    let html = '';
+    ofertas.forEach((producto, index) => {
+        console.log(`Producto ${index}:`, producto);
+        
+        // Validar datos mínimos
+        if (!producto || !producto.id) {
+            console.warn(`Producto ${index} inválido:`, producto);
+            return;
+        }
+        
+        // Asegurar valores
+        const descuento = producto.descuento || 0;
+        const precio = parseFloat(producto.precio) || 0;
+        const precioDescuento = parseFloat(producto.precio_descuento) || 0;
+        const tiempo = producto.tiempo_restante || '24:00:00';
+        const imagen = producto.imagen || 'producto_default.png';
+        const nombre = producto.producto || 'Producto';
+        const marca = producto.marca || '';
+        
+        html += `
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="card h-100 border border-danger" style="min-height: 320px;">
+                    <div class="position-relative">
+                        <img src="Util/Img/Producto/${imagen}" 
+                             class="card-img-top p-3" 
+                             alt="${nombre}"
+                             style="height: 150px; object-fit: contain;"
+                             onerror="this.src='Util/Img/Producto/producto_default.png'">
+                        <span class="position-absolute top-0 end-0 bg-danger text-white px-2 py-1 m-2 rounded">
+                            -${descuento}%
+                        </span>
+                    </div>
+                    
+                    <div class="card-body p-3">
+                        <small class="text-muted d-block mb-1">${marca}</small>
+                        <h6 class="card-title" style="font-size: 0.9rem; height: 40px; overflow: hidden;">
+                            <a href="Views/descripcion.php?id=${producto.id}" 
+                               class="text-decoration-none text-dark">
+                                ${nombre.substring(0, 35)}${nombre.length > 35 ? '...' : ''}
+                            </a>
+                        </h6>
+                        
+                        <div class="mb-2">
+                            <small class="text-danger">
+                                <i class="fas fa-clock"></i> ${tiempo}
+                            </small>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-decoration-line-through text-muted d-block">
+                                    $${precio.toFixed(2)}
+                                </small>
+                                <strong class="text-danger fs-5">
+                                    $${precioDescuento.toFixed(2)}
+                                </strong>
+                            </div>
+                            <button class="btn btn-danger btn-sm rounded-circle" 
+                                    onclick="agregarOferta(${producto.id})">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    $("#ofertas-flash-container").html(html || mostrarSinOfertas());
+}
+
+// Función para probar el endpoint directamente
+function probarEndpointOfertas() {
+    console.log("=== PRUEBA DIRECTA DEL ENDPOINT ===");
+    
+    // 1. Primero probar con fetch simple
+    fetch("Controllers/OfertasController.php", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: "funcion=obtener_ofertas_flash&tipo=todas&limite=3"
+    })
+    .then(response => response.text())
+    .then(text => {
+        console.log("Respuesta CRUDA (texto):", text);
+        console.log("Longitud:", text.length);
+        
+        // Intentar parsear como JSON
+        try {
+            const json = JSON.parse(text);
+            console.log("Parseado como JSON:", json);
+        } catch (e) {
+            console.error("NO es JSON válido. Contenido completo:");
+            console.log(text);
+        }
+    })
+    .catch(error => {
+        console.error("Error en fetch:", error);
+    });
+}
+
+// Función para agregar al carrito
+function agregarOferta(productoId) {
+    // Usa la misma función que usas en el resto de tu sitio
+    // O implementa algo simple:
+    $.post("Controllers/CarritoController.php", {
+        funcion: "agregar_carrito",
+        producto_id: productoId,
+        cantidad: 1
+    }, function(respuesta) {
+        // Mostrar notificación si quieres
+        console.log("Producto agregado:", respuesta);
+    });
+}
 });
