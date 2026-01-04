@@ -299,7 +299,7 @@ switch($filtro) {
                 </div>
             </div>
         </div>
-        <!-- Estilos específicos para centro de ayuda -->
+<!-- Estilos específicos para centro de ayuda -->
         <style>
         .card-categoria-ayuda {
             color: inherit;
@@ -572,11 +572,7 @@ switch($filtro) {
         break;
 }
 ?>
-<style>
-h4{
-    color: black;
-}
-</style>
+
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -601,7 +597,7 @@ h4{
                 <div class="col-md-3">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0" style="color:black">Secciones de Soporte</h5>
+                            <h5 class="card-title mb-0">Secciones de Soporte</h5>
                         </div>
                         <div class="card-body p-0">
                             <div class="list-group list-group-flush">
@@ -681,7 +677,6 @@ h4{
             }
         });
 
-        <!-- Scripts para funcionalidad del centro de ayuda -->
         $(document).ready(function() {
             // Búsqueda en FAQ
             $("#buscarAyuda, #btnBuscarAyuda").on("input click", function() {
