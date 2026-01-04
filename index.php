@@ -18,57 +18,7 @@ include_once 'Views/Layauts/header.php';
     </div>
 </section>
 <style>
-    :root {
-        --primary: #4361ee;
-        --secondary: #3f37c9;
-        --accent: #4cc9f0;
-        --success: #4bb543;
-        --warning: #ffc107;
-        --danger: #e63946;
-        --light: #f8f9fa;
-        --dark: #212529;
-        --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-        --gradient-accent: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
-        --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
-        --border-radius: 12px;
-        --transition: all 0.3s ease;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f5f7ff;
-        color: #333;
-        line-height: 1.6;
-    }
-
-    .container-fluid {
-        padding: 0 15px;
-    }
-
-    /* Header Styles */
-    .content-header {
-        padding: 20px 0;
-        background: var(--gradient-primary);
-        color: white;
-        border-radius: 0 0 var(--border-radius) var(--border-radius);
-        margin-bottom: 30px;
-        box-shadow: var(--shadow);
-    }
-
-    .content-header h1 {
-        font-weight: 600;
-        margin: 0;
-        font-size: 2rem;
-    }
-
-    .breadcrumb {
+   .breadcrumb {
         background: transparent;
         margin: 0;
         padding: 0;
@@ -938,6 +888,165 @@ include_once 'Views/Layauts/header.php';
         background-color: #f8f9fa;
         border-color: #007bff;
     }
+
+    /* Estilos para ofertas flash simplificadas */
+.flash-sales-simple {
+    background: linear-gradient(135deg, #fff8f8 0%, #ffeded 100%);
+    padding: 2rem 0;
+    border-radius: 12px;
+    border: 1px solid #ffcccc;
+}
+
+.flash-product-card {
+    position: relative;
+    border: 2px solid #ffcccc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    height: 100%;
+    overflow: hidden;
+}
+
+.flash-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.15);
+    border-color: #ff6666;
+}
+
+.flash-discount-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ff4444;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    z-index: 2;
+}
+
+.flash-time-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 2;
+}
+
+.flash-price {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ff4444;
+}
+
+.flash-old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+/* Estilo mínimo para ofertas flash */
+.border-danger.border-opacity-25 {
+    transition: transform 0.2s;
+}
+.border-danger.border-opacity-25:hover {
+    transform: translateY(-3px);
+    border-color: #dc3545 !important;
+}
+
+/* ====================================
+   ESTILOS PARA PAGINACIÓN DE MARCAS
+   ==================================== */
+
+/* Contenedor principal */
+.pagination-marcas {
+    margin: 20px 0;
+}
+
+/* Personalización de la paginación Bootstrap */
+.pagination-marcas .pagination {
+    margin-bottom: 0;
+}
+
+.pagination-marcas .page-link {
+    color: #4361ee; /* Color primario de tu tema */
+    border: 1px solid #dee2e6;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.pagination-marcas .page-link:hover {
+    color: #fff;
+    background-color: #3a0ca3; /* Color secundario */
+    border-color: #3a0ca3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(58, 12, 163, 0.2);
+}
+
+.pagination-marcas .page-item.active .page-link {
+    background: var(--gradient-primary); /* Usa tu variable CSS */
+    color: white;
+    border-color: #4361ee;
+    font-weight: 600;
+}
+
+.pagination-marcas .page-item.disabled .page-link {
+    color: #adb5bd;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+/* Flechas con iconos Font Awesome */
+.pagination-marcas .page-link i {
+    font-size: 0.8rem;
+}
+
+/* Separador de puntos suspensivos */
+.pagination-marcas .page-item.disabled .page-link:not([href]) {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    padding: 6px 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pagination-marcas .page-link {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        margin: 0 2px;
+    }
+    
+    .pagination-marcas .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Estilo alternativo más moderno */
+.pagination-marcas.modern .page-link {
+    border-radius: 8px;
+    margin: 0 4px;
+    border: none;
+    background: #f8f9fa;
+}
+
+.pagination-marcas.modern .page-item.active .page-link {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+/* Para la información de página actual */
+.pagination-info {
+    font-size: 0.875rem;
+    color: #6c757d;
+    padding: 8px 0;
+}
 </style>
 
 
@@ -982,40 +1091,28 @@ include_once 'Views/Layauts/header.php';
     </div>
 
     <!-- Flash Sales Section -->
-    <div class="flash-sales-section mb-5">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center footer-link en-desarrollo">
-                <h3 class="card-title mb-0">
-                    <i class="fas fa-bolt text-warning mr-2"></i>
-                    Ofertas Relámpago
-                </h3>
-                <div class="flash-timer">
-                    <span class="timer-label">Termina en:</span>
-                    <div id="flash-countdown" class="countdown-timer">
-                        <span class="countdown-item">
-                            <span class="countdown-number">02</span>
-                            <span class="countdown-label">Hrs</span>
-                        </span>
-                        <span class="countdown-separator">:</span>
-                        <span class="countdown-item">
-                            <span class="countdown-number">45</span>
-                            <span class="countdown-label">Min</span>
-                        </span>
-                        <span class="countdown-separator">:</span>
-                        <span class="countdown-item">
-                            <span class="countdown-number">30</span>
-                            <span class="countdown-label">Seg</span>
-                        </span>
-                    </div>
+    <section class="mt-5">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="text-danger">
+                <i class="fas fa-bolt"></i> Ofertas Flash
+            </h3>
+            <a href="Views/ofertas.php" class="btn btn-sm btn-outline-danger">
+                Ver todas
+            </a>
+        </div>
+        
+        <div class="row" id="ofertas-flash-container">
+            <!-- Las ofertas se cargan aquí -->
+            <div class="col-12 text-center py-3">
+                <div class="spinner-border spinner-border-sm text-danger" role="status">
+                    <span class="visually-hidden">Cargando...</span>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="row" id="flash-products">
-                    <!-- Los productos en oferta se cargarán aquí -->
-                </div>
+                <small class="text-muted ms-2">Cargando ofertas...</small>
             </div>
         </div>
     </div>
+</section>
     <!-- Featured Products -->
     <div class="featured-products">
         <div class="section-title">
@@ -1059,29 +1156,7 @@ include_once 'Views/Layauts/header.php';
             </div>
         </div>
     </div>
-    <!-- Featured Offers -->
-    <section class="featured-offers my-5">
-        <div class="card">
-            <div class="card-header">
-                <!--  -->
-                <h2><i class="fas fa-fire text-danger mr-2"></i> Ofertas Destacadas</h2>
-            </div>
-            <div class="card-body">
-                <div id="offers-dest" class="row">
-                    <!-- Aquí puedes mostrar algunas ofertas destacadas -->
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="mb-4">
-                    <a href="Views/ofertas.php" class="btn btn-outline-primary">
-                        Ver todas las ofertas <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-            </div>
-
-
-        </div>
-    </section>
+    
     <!-- Featured Categories -->
     <div class="featured-categories mb-5">
         <div class="section-title">
