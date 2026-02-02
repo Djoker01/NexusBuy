@@ -3671,6 +3671,7 @@ $(document).ready(function () {
         }
 
         datosTransferencia = {
+          orden_id: ordenId,
             banco: parsed.banco,
             fecha: parsed.fecha,
             numero_transaccion: parsed.transaccion,
@@ -4474,7 +4475,7 @@ console.log("📊 Detalles de la orden:", {
       html: `
             <div class="text-left">
                 <p><strong>Transacción verificada:</strong> ${numeroTransaccion}</p>
-                <p><strong>Orden:</strong> #${data.numero_orden}</p>
+                <p><strong>Orden:</strong> # ${data.numero_orden}</p>
                 <p><strong>Fecha de registro:</strong> ${new Date().toLocaleString()}</p>
                 <p><strong>Estado:</strong> <span class="badge badge-warning">En verificación</span></p>
                 <hr>
