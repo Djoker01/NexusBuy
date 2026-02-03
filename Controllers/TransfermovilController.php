@@ -161,9 +161,13 @@ if ($funcion == 'verificar_pago') {
                 ':orden_id' => $orden_id
             ]);
             
+            // Registrar en historial
+            $historial->registrar($orden_id, $admin_id, "pago_{$accion}", $comentario);
+            
             // Registrar en logs_pagos
             $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, id_usuario, fecha_log)
                       VALUES (:orden_id, :accion, :detalles, :id_usuario, NOW())";
+            
             $queryLog = $orden->acceso->prepare($sqlLog);
             $queryLog->execute([
                 ':orden_id' => $orden_id,
@@ -499,10 +503,29 @@ echo json_encode([
 ]);
             
             // 10. Registrar en historial
-            $descripcion = "Transf. registrada: " . strtoupper($datos['numero_transaccion']) . 
-                               " - Banco: " . $datos['banco'] . 
-                               " - Monto: $" . $datos['monto_transferido'];
-            $historial->crear_historial($descripcion, 6, 14, $id_usuario, 'transferencia_registrada');
+            $descripcion = "Transferencia registrada: " . strtoupper($datos['numero_transaccion']) . 
+               " - Banco: " . $datos['banco'] . 
+               " - Monto: $" . $datos['monto_transferido'];
+
+// Datos adicionales en JSON
+$datosAdicionales = json_encode([
+    'orden_id' => $datos['orden_id'],
+    'transferencia_id' => $idTransferencia,
+    'numero_transaccion' => strtoupper($datos['numero_transaccion']),
+    'monto' => $datos['monto_transferido'],
+    'banco' => $datos['banco'],
+    'fecha' => $datos['fecha']
+]);
+
+// Usar crear_historial con los parámetros correctos
+$historial->crear_historial(
+    $descripcion,              // Descripción detallada
+    6,                         // tipo_historial (ajusta si es necesario)
+    14,                        // modulo (ajusta si es necesario)
+    $id_usuario,               // ID del usuario
+    'transferencia_registrada', // Acción
+    $datosAdicionales          // Datos adicionales en JSON
+);
             
             // 11. Registrar en logs_pagos
             $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, id_usuario, fecha_log)
@@ -632,8 +655,7 @@ if ($funcion == 'notificar_pago') {
         $queryUpdate->execute([':orden_id' => $orden_id]);
         
         // Registrar en historial
-        $descripcion = "Usuario notificó que realizó el pago";
-        $historial->crear_historial($descripcion, 11, 4, $id_usuario, 'pago_notificado');
+        $historial->registrar($orden_id, $id_usuario, 'pago_notificado', 'Usuario notificó que realizó el pago');
         
         // Registrar en logs_pagos
         $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, id_usuario, fecha_log)
