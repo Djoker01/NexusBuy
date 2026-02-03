@@ -1,4 +1,8 @@
 <?php
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
 include_once '../Models/Orden.php';
 include_once '../Models/Usuario.php';
 include_once '../Models/Historial.php';
@@ -124,15 +128,15 @@ if ($funcion == 'verificar_pago') {
         try {
             // Actualizar orden
             $sqlOrden = "UPDATE orden 
-                        SET estado_pago = :estado,
-                            fecha_pago = NOW(),
-                            fecha_actualizacion = NOW(),
-                            observaciones = CONCAT(COALESCE(observaciones, ''), 
-                                ' | Verificado por admin #', :admin_id, 
-                                ' el ', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i'), 
-                                ': ', :comentario)
-                        WHERE id = :orden_id 
-                        AND estado_pago = 'pendiente'";
+            SET estado_pago = :estado,
+                fecha_pago = NOW(),
+                fecha_actualizacion = NOW(),
+                notas_internas = CONCAT(COALESCE(notas_internas, ''), 
+                    ' | Verificado por admin #', :admin_id, 
+                    ' el ', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i'), 
+                    ': ', :comentario)
+            WHERE id = :orden_id 
+            AND estado_pago = 'pendiente'";
             
             $queryOrden = $orden->acceso->prepare($sqlOrden);
             $resultOrden = $queryOrden->execute([
@@ -157,19 +161,15 @@ if ($funcion == 'verificar_pago') {
                 ':orden_id' => $orden_id
             ]);
             
-            // Registrar en historial
-            $historial->registrar($orden_id, $admin_id, "pago_{$accion}", $comentario);
-            
             // Registrar en logs_pagos
-            $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, usuario_id, fecha_log)
-                      VALUES (:orden_id, :accion, :detalles, :usuario_id, NOW())";
-            
+            $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, id_usuario, fecha_log)
+                      VALUES (:orden_id, :accion, :detalles, :id_usuario, NOW())";
             $queryLog = $orden->acceso->prepare($sqlLog);
             $queryLog->execute([
                 ':orden_id' => $orden_id,
                 ':accion' => "verificacion_{$accion}",
                 ':detalles' => "Estado: {$nuevo_estado}. Comentario: {$comentario}",
-                ':usuario_id' => $admin_id
+                ':id_usuario' => $admin_id
             ]);
             
             // Confirmar transacción
@@ -286,6 +286,13 @@ if ($funcion == 'registrar_transferencia_segura') {
         if (!$datos) {
             $datos = $_POST;
         }
+
+        // error_log("=== TRANSFERMOVIL DEBUG ===");
+        // error_log("Datos recibidos: " . print_r($datos, true));
+        // error_log("Usuario sesión ID: " . ($_SESSION['id'] ?? 'NO DEFINIDO'));
+        // error_log("Usuario sesión ID tipo: " . gettype($_SESSION['id'] ?? 'null'));
+        // error_log("Orden ID recibida: " . ($datos['orden_id'] ?? 'NO RECIBIDO'));
+        // error_log("Monto recibido: " . ($datos['monto_transferido'] ?? 'NO RECIBIDO'));
         
         // Validar datos requeridos
         $camposRequeridos = [
@@ -299,26 +306,43 @@ if ($funcion == 'registrar_transferencia_segura') {
             }
         }
         
-        $usuario_id = $_SESSION['id'];
+        $id_usuario = $_SESSION['id'];
         
         // Iniciar transacción
         $orden->acceso->beginTransaction();
         
         try {
             // 1. Verificar que la orden pertenece al usuario
-            $sqlVerificarOrden = "SELECT o.* FROM orden o 
-                                  WHERE o.id = :orden_id 
-                                  AND o.id_usuario = :usuario_id
-                                  AND o.metodo_pago_codigo = 'transfermovil'
-                                  AND o.estado_pago = 'pendiente'";
+            $sqlVerificarOrden = "SELECT 
+                        o.id,
+                        o.total as monto_total,          -- Campo alternativo
+                        o.id_usuario,
+                        o.estado_pago,
+                        o.metodo_pago_codigo,
+                        o.numero_orden,
+                        o.referencia_pago
+                      FROM orden o 
+                      WHERE o.id = :orden_id 
+                      AND o.id_usuario = :id_usuario
+                      AND o.metodo_pago_codigo = 'transfermovil'
+                      AND o.estado_pago = 'pendiente'";
             
             $queryVerificar = $orden->acceso->prepare($sqlVerificarOrden);
             $queryVerificar->execute([
-                ':orden_id' => $datos['orden_id'],
-                ':usuario_id' => $usuario_id
+                ':orden_id' => intval($datos['orden_id']),
+                ':id_usuario' => $id_usuario
             ]);
             
             $ordenData = $queryVerificar->fetch();
+
+            // También agrega después de obtener $ordenData:
+// error_log("Orden encontrada: " . ($ordenData ? "SÍ" : "NO"));
+// if ($ordenData) {
+//     error_log("Orden ID en BD: " . $ordenData->id);
+//     error_log("Orden monto_total en BD: " . $ordenData->monto_total);
+//     error_log("Orden id_usuario en BD: " . $ordenData->id_usuario);
+//     error_log("Orden estado_pago en BD: " . $ordenData->estado_pago);
+// }
             
             if (!$ordenData) {
                 throw new Exception('Orden no válida o ya procesada');
@@ -363,9 +387,16 @@ if ($funcion == 'registrar_transferencia_segura') {
             
             // 6. Validar número de cuenta del beneficiario (formato: 9200XXXXXXXX5658)
             $numeroCuenta = preg_replace('/\s+/', '', $datos['numero_tarjeta_beneficiario']);
-            if (strlen($numeroCuenta) !== 16 || !preg_match('/^9200\d{12}$/', $numeroCuenta)) {
-                throw new Exception('Número de cuenta del beneficiario inválido. Formato: 9200XXXXXXXX5658');
-            }
+
+// Validar que sea exactamente el número completo
+if ($numeroCuenta !== '9238959871235406') {
+    throw new Exception('Número de cuenta del beneficiario no coincide con el esperado');
+}
+
+// O si es un número real que empieza con 9238 y termina con 5406:
+if (!preg_match('/^9238\d{8}5406$/', $numeroCuenta)) {
+    throw new Exception('Número de cuenta inválido. Debe tener formato: 9238 + 8 dígitos + 5406');
+}
             
             // 7. Validar banco (lista blanca de bancos cubanos)
             $bancosPermitidos = [
@@ -389,63 +420,93 @@ if ($funcion == 'registrar_transferencia_segura') {
             }
             
             // 8. Registrar la transferencia en transferencia_pagos
-            $sqlInsert = "INSERT INTO transferencia_pagos 
-                         (id_orden, usuario_id, banco, fecha_transferencia, 
-                          numero_transaccion, monto, saldo_restante, 
-                          numero_tarjeta_beneficiario, estado, fecha_registro) 
-                         VALUES (:orden_id, :usuario_id, :banco, :fecha, 
-                                 :numero_transaccion, :monto, :saldo_restante, 
-                                 :numero_tarjeta, 'pendiente', NOW())";
-            
-            $queryInsert = $orden->acceso->prepare($sqlInsert);
-            $resultInsert = $queryInsert->execute([
-                ':orden_id' => $datos['orden_id'],
-                ':usuario_id' => $usuario_id,
-                ':banco' => $datos['banco'],
-                ':fecha' => $datos['fecha'],
-                ':numero_transaccion' => strtoupper($datos['numero_transaccion']),
-                ':monto' => $datos['monto_transferido'],
-                ':saldo_restante' => $datos['saldo_restante'] ?? null,
-                ':numero_tarjeta' => $datos['numero_tarjeta_beneficiario']
-            ]);
-            
-            if (!$resultInsert) {
-                throw new Exception('Error al registrar la transferencia en la base de datos');
-            }
-            
-            $idTransferencia = $orden->acceso->lastInsertId();
-            
-            // 9. Actualizar observaciones de la orden
-            $observacion = "Transferencia registrada: " . strtoupper($datos['numero_transaccion']) . 
-                          " | Monto: $" . $datos['monto_transferido'] . 
-                          " | Fecha: " . $datos['fecha'] . 
-                          " | Banco: " . $datos['banco'];
-            
-            $sqlUpdateOrden = "UPDATE orden 
-                              SET observaciones = CONCAT(
-                                  COALESCE(observaciones, ''), 
-                                  IF(COALESCE(observaciones, '') != '', ' | ', ''), 
-                                  :observacion
-                              ),
-                              fecha_actualizacion = NOW()
-                              WHERE id = :orden_id";
-            
-            $queryUpdate = $orden->acceso->prepare($sqlUpdateOrden);
-            $queryUpdate->execute([
-                ':observacion' => $observacion,
-                ':orden_id' => $datos['orden_id']
-            ]);
+
+            error_log("=== INICIANDO INSERT SIMPLIFICADO ===");
+
+// 1. Validar usuario_id
+$usuario_id = intval($_SESSION['id'] ?? 0);
+if ($usuario_id == 0) {
+    throw new Exception('Usuario no autenticado. Por favor, inicia sesión nuevamente.');
+}
+
+// 2. Consulta SQL simplificada (sin saldo_restante ni numero_tarjeta temporalmente)
+$sqlInsert = "INSERT INTO transferencia_pagos 
+             (id_orden, id_usuario, banco, fecha_transferencia, 
+              numero_transaccion, monto, estado) 
+             VALUES (:orden_id, :usuario_id, :banco, :fecha, 
+                     :numero_transaccion, :monto, 'pendiente')";
+
+// error_log("SQL a ejecutar: " . $sqlInsert);
+
+$queryInsert = $orden->acceso->prepare($sqlInsert);
+$resultInsert = $queryInsert->execute([
+    ':orden_id' => intval($datos['orden_id']),
+    ':usuario_id' => $usuario_id,
+    ':banco' => $datos['banco'],
+    ':fecha' => $datos['fecha'],
+    ':numero_transaccion' => strtoupper($datos['numero_transaccion']),
+    ':monto' => floatval($datos['monto_transferido'])
+]);
+
+if (!$resultInsert) {
+    $errorInfo = $queryInsert->errorInfo();
+    // error_log("Error en INSERT: " . print_r($errorInfo, true));
+    throw new Exception('Error al registrar: ' . $errorInfo[2]);
+}
+
+$idTransferencia = $orden->acceso->lastInsertId();
+// error_log("✅ INSERT exitoso! ID: " . $idTransferencia);
+
+// 9. Actualizar notas_internas (ya corregido)
+$observacion = "Transferencia registrada: " . strtoupper($datos['numero_transaccion']) . 
+              " | Monto: $" . $datos['monto_transferido'] . 
+              " | Fecha: " . $datos['fecha'] . 
+              " | Banco: " . $datos['banco'];
+
+$sqlUpdateOrden = "UPDATE orden 
+                  SET notas_internas = CONCAT(
+                      COALESCE(notas_internas, ''), 
+                      IF(COALESCE(notas_internas, '') != '', ' | ', ''), 
+                      :observacion
+                  ),
+                  fecha_actualizacion = NOW()
+                  WHERE id = :orden_id";
+
+$queryUpdate = $orden->acceso->prepare($sqlUpdateOrden);
+$queryUpdate->execute([
+    ':observacion' => $observacion,
+    ':orden_id' => $datos['orden_id']
+]);
+
+// Confirmar transacción
+$orden->acceso->commit();
+
+// error_log("✅ Transacción COMPLETADA exitosamente para orden: " . $datos['orden_id']);
+
+$sqlNumeroOrden = "SELECT numero_orden FROM orden WHERE id = :orden_id";
+$queryNumero = $orden->acceso->prepare($sqlNumeroOrden);
+$queryNumero->execute([':orden_id' => $datos['orden_id']]);
+$resultadoNumero = $queryNumero->fetch();
+
+$numeroOrden = $resultadoNumero ? $resultadoNumero->numero_orden : 'N/A';
+
+echo json_encode([
+    'success' => true,
+    'message' => 'Transferencia registrada exitosamente',
+    'registro_id' => $idTransferencia,
+    'numero_transaccion' => strtoupper($datos['numero_transaccion']),
+    'numero_orden' => $numeroOrden  // ← ¡AGREGAR ESTO!
+]);
             
             // 10. Registrar en historial
-            $detalleHistorial = "Transf. registrada: " . strtoupper($datos['numero_transaccion']) . 
+            $descripcion = "Transf. registrada: " . strtoupper($datos['numero_transaccion']) . 
                                " - Banco: " . $datos['banco'] . 
                                " - Monto: $" . $datos['monto_transferido'];
-            
-            $historial->registrar($datos['orden_id'], $usuario_id, 'transferencia_registrada', $detalleHistorial);
+            $historial->crear_historial($descripcion, 6, 14, $id_usuario, 'transferencia_registrada');
             
             // 11. Registrar en logs_pagos
-            $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, usuario_id, fecha_log)
-                      VALUES (:orden_id, :accion, :detalles, :usuario_id, NOW())";
+            $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, id_usuario, fecha_log)
+                      VALUES (:orden_id, :accion, :detalles, :id_usuario, NOW())";
             
             $queryLog = $orden->acceso->prepare($sqlLog);
             $queryLog->execute([
@@ -454,7 +515,7 @@ if ($funcion == 'registrar_transferencia_segura') {
                 ':detalles' => "Transacción: " . strtoupper($datos['numero_transaccion']) . 
                               " | Monto: $" . $datos['monto_transferido'] . 
                               " | Banco: " . $datos['banco'],
-                ':usuario_id' => $usuario_id
+                ':id_usuario' => $id_usuario
             ]);
             
             // Confirmar transacción
@@ -536,19 +597,19 @@ if ($funcion == 'notificar_pago') {
         verificarUsuario();
         
         $orden_id = intval($_POST['orden_id']);
-        $usuario_id = $_SESSION['id'];
+        $id_usuario = $_SESSION['id'];
         
         // Verificar que la orden pertenece al usuario
         $sqlVerificar = "SELECT COUNT(*) as count 
                         FROM orden 
                         WHERE id = :orden_id 
-                        AND id_usuario = :usuario_id
+                        AND id_usuario = :id_usuario
                         AND estado_pago = 'pendiente'";
         
         $queryVerificar = $orden->acceso->prepare($sqlVerificar);
         $queryVerificar->execute([
             ':orden_id' => $orden_id,
-            ':usuario_id' => $usuario_id
+            ':id_usuario' => $id_usuario
         ]);
         $result = $queryVerificar->fetch();
         
@@ -571,18 +632,19 @@ if ($funcion == 'notificar_pago') {
         $queryUpdate->execute([':orden_id' => $orden_id]);
         
         // Registrar en historial
-        $historial->registrar($orden_id, $usuario_id, 'pago_notificado', 'Usuario notificó que realizó el pago');
+        $descripcion = "Usuario notificó que realizó el pago";
+        $historial->crear_historial($descripcion, 11, 4, $id_usuario, 'pago_notificado');
         
         // Registrar en logs_pagos
-        $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, usuario_id, fecha_log)
+        $sqlLog = "INSERT INTO logs_pagos (orden_id, accion, detalles, id_usuario, fecha_log)
                   VALUES (:orden_id, 'notificacion_usuario', 
                           'Usuario notificó haber realizado el pago', 
-                          :usuario_id, NOW())";
+                          :id_usuario, NOW())";
         
         $queryLog = $orden->acceso->prepare($sqlLog);
         $queryLog->execute([
             ':orden_id' => $orden_id,
-            ':usuario_id' => $usuario_id
+            ':id_usuario' => $id_usuario
         ]);
         
         echo json_encode([
@@ -611,20 +673,20 @@ if ($funcion == 'obtener_datos_orden') {
         }
         
         $orden_id = intval($datos['orden_id'] ?? 0);
-        $usuario_id = $_SESSION['id'];
+        $id_usuario = $_SESSION['id'];
         
         // Verificar que la orden pertenece al usuario
         $sql = "SELECT o.total as monto_total, o.numero_orden, o.referencia_pago,
-                       o.metodo_pago_codigo, o.estado_pago
+                       o.metodo_pago_codigo, o.estado_pago, o.id
                 FROM orden o
                 WHERE o.id = :orden_id 
-                AND o.id_usuario = :usuario_id
+                AND o.id_usuario = :id_usuario
                 AND o.metodo_pago_codigo = 'transfermovil'";
         
         $query = $orden->acceso->prepare($sql);
         $query->execute([
             ':orden_id' => $orden_id,
-            ':usuario_id' => $usuario_id
+            ':id_usuario' => $id_usuario
         ]);
         
         $ordenData = $query->fetch();
@@ -651,6 +713,7 @@ if ($funcion == 'obtener_datos_orden') {
         echo json_encode([
             'success' => true,
             'orden' => [
+                'id' => $ordenData->id,
                 'monto_total' => $ordenData->monto_total,
                 'numero_orden' => $ordenData->numero_orden,
                 'referencia' => $ordenData->referencia_pago,
@@ -673,20 +736,20 @@ if ($funcion == 'generar_referencia_pago') {
         verificarUsuario();
         
         $orden_id = intval($_POST['orden_id']);
-        $usuario_id = $_SESSION['id'];
+        $id_usuario = $_SESSION['id'];
         
         // Verificar que la orden pertenece al usuario
         $sqlVerificar = "SELECT COUNT(*) as count 
                         FROM orden 
                         WHERE id = :orden_id 
-                        AND id_usuario = :usuario_id
+                        AND id_usuario = :id_usuario
                         AND metodo_pago_codigo = 'transfermovil'
                         AND estado_pago = 'pendiente'";
         
         $queryVerificar = $orden->acceso->prepare($sqlVerificar);
         $queryVerificar->execute([
             ':orden_id' => $orden_id,
-            ':usuario_id' => $usuario_id
+            ':id_usuario' => $id_usuario
         ]);
         $result = $queryVerificar->fetch();
         
@@ -724,7 +787,7 @@ if ($funcion == 'obtener_mis_transferencias') {
     try {
         verificarUsuario();
         
-        $usuario_id = $_SESSION['id'];
+        $id_usuario = $_SESSION['id'];
         $pagina = isset($_POST['pagina']) ? intval($_POST['pagina']) : 1;
         $porPagina = isset($_POST['por_pagina']) ? intval($_POST['por_pagina']) : 10;
         $offset = ($pagina - 1) * $porPagina;
@@ -733,10 +796,10 @@ if ($funcion == 'obtener_mis_transferencias') {
         $sqlCount = "SELECT COUNT(*) as total 
                     FROM transferencia_pagos tp
                     JOIN orden o ON tp.id_orden = o.id
-                    WHERE tp.usuario_id = :usuario_id";
+                    WHERE tp.id_usuario = :id_usuario";
         
         $queryCount = $orden->acceso->prepare($sqlCount);
-        $queryCount->execute([':usuario_id' => $usuario_id]);
+        $queryCount->execute([':id_usuario' => $id_usuario]);
         $total = $queryCount->fetch()->total;
         
         // Obtener transferencias
@@ -745,12 +808,12 @@ if ($funcion == 'obtener_mis_transferencias') {
                        o.fecha_creacion as fecha_orden
                 FROM transferencia_pagos tp
                 JOIN orden o ON tp.id_orden = o.id
-                WHERE tp.usuario_id = :usuario_id
+                WHERE tp.id_usuario = :id_usuario
                 ORDER BY tp.fecha_registro DESC
                 LIMIT :offset, :limit";
         
         $query = $orden->acceso->prepare($sql);
-        $query->bindValue(':usuario_id', $usuario_id, PDO::PARAM_INT);
+        $query->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
         $query->bindValue(':offset', $offset, PDO::PARAM_INT);
         $query->bindValue(':limit', $porPagina, PDO::PARAM_INT);
         $query->execute();
@@ -784,4 +847,3 @@ if ($funcion == '') {
         'message' => 'Función no especificada o inválida'
     ]);
 }
-?>
