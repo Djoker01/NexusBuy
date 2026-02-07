@@ -255,23 +255,23 @@ if ($_POST['funcion'] == 'procesar_pago') {
         // 1. VERIFICAR SESIÓN
         if (empty($_SESSION['id'])) {
             echo json_encode([
-                'success' => false,
-                'error' => 'no_sesion',
+                'success' => false, 
+                'error' => 'no_sesion', 
                 'message' => 'Debes iniciar sesión para realizar el pago'
             ]);
             exit();
         }
 
         $id_usuario = $_SESSION['id'];
-
+        
         // 2. VALIDAR DATOS BÁSICOS
         if (empty($_POST['direccion_envio']) || empty($_POST['items_seleccionados'])) {
             throw new Exception('Datos incompletos');
         }
-
+        
         $direccion_envio = filter_var($_POST['direccion_envio'], FILTER_SANITIZE_STRING);
         $items_seleccionados = json_decode($_POST['items_seleccionados'], true);
-
+        
         if (!is_array($items_seleccionados) || count($items_seleccionados) === 0) {
             throw new Exception('No hay productos seleccionados');
         }
@@ -281,11 +281,11 @@ if ($_POST['funcion'] == 'procesar_pago') {
         $envio = isset($_POST['envio']) ? floatval($_POST['envio']) : 0;
         $total = isset($_POST['total']) ? floatval($_POST['total']) : 0;
         $descuento = isset($_POST['descuento']) ? floatval($_POST['descuento']) : 0;
-
+        
         if ($total <= 0) {
             throw new Exception('Monto total inválido');
         }
-
+        
         // ======= MODIFICACIÓN 1: OBTENER MÉTODO DE PAGO =======
         // 3.A OBTENER Y VALIDAR EL MÉTODO DE PAGO
         $metodo_pago_codigo = isset($_POST['metodo_pago']) ? trim($_POST['metodo_pago']) : 'efectivo';
@@ -293,26 +293,26 @@ if ($_POST['funcion'] == 'procesar_pago') {
         if (!in_array($metodo_pago_codigo, $metodos_permitidos)) {
             throw new Exception('Método de pago no válido.');
         }
-
+        
         // 4. VERIFICAR STOCK ANTES DE PROCESAR (CÓDIGO ORIGINAL)
         $stock_disponible = true;
         $productos_sin_stock = [];
-
+        
         foreach ($items_seleccionados as $item_id) {
             $sql_carrito = "SELECT c.cantidad, pt.id as id_producto_tienda, pt.stock, p.nombre
                            FROM carrito c
                            JOIN producto_tienda pt ON c.id_producto_tienda = pt.id
                            JOIN producto p ON pt.id_producto = p.id
                            WHERE c.id = :item_id AND c.id_usuario = :id_usuario";
-
+            
             $query = $orden->acceso->prepare($sql_carrito);
             $query->execute([':item_id' => $item_id, ':id_usuario' => $id_usuario]);
             $producto = $query->fetch();
-
+            
             if (!$producto) {
                 throw new Exception("Producto no encontrado en el carrito");
             }
-
+            
             if ($producto->stock < $producto->cantidad) {
                 $stock_disponible = false;
                 $productos_sin_stock[] = [
@@ -322,7 +322,7 @@ if ($_POST['funcion'] == 'procesar_pago') {
                 ];
             }
         }
-
+        
         if (!$stock_disponible) {
             $error_msg = "Stock insuficiente para: ";
             foreach ($productos_sin_stock as $prod) {
@@ -330,76 +330,125 @@ if ($_POST['funcion'] == 'procesar_pago') {
             }
             throw new Exception($error_msg);
         }
-
+        
         // ======= MODIFICACIÓN 2: CREAR ORDEN CON MÉTODO DE PAGO =======
         // 5. CREAR ORDEN (CON EL NUEVO PARÁMETRO)
         $resultado_orden = $orden->crear_orden(
-            $id_usuario,
-            $subtotal,
-            $envio,
+            $id_usuario, 
+            $subtotal, 
+            $envio, 
             $descuento, // descuento
-            $total,
+            $total, 
             $direccion_envio,
             $metodo_pago_codigo  // <-- NUEVO PARÁMETRO
         );
-
+        
         if (!$resultado_orden['success']) {
             throw new Exception("Error al crear orden: " . $resultado_orden['error']);
         }
-
+        
         $id_orden = $resultado_orden['id_orden'];
         $numero_orden = $resultado_orden['numero_orden'];
         $referencia_pago = $resultado_orden['referencia_pago'] ?? null;
-
+        
         // ======= MODIFICACIÓN 3: BIFURCAR SEGÚN MÉTODO DE PAGO =======
-        // 6. DECIDIR EL FLUJO SEGÚN EL MÉTODO DE PAGO
-        if ($metodo_pago_codigo === 'transfermovil') {
-            // 🎯 FLUJO PARA PAGO MANUAL CON TRANSFERMÓVIL
-            // NO procesamos items, NO actualizamos stock, NO vaciamos carrito
-
-            // 6.A Obtener configuración de Transfermóvil (necesitas crear esta función)
-            $configTM = $metodo_pago->obtenerConfiguracionTransfermovil();
-
-            if (!$configTM || !$configTM['activo']) {
-                throw new Exception('El método de pago Transfermóvil no está disponible en este momento.');
-            }
-
-            // 6.B Respuesta ESPECIAL con instrucciones
-            echo json_encode([
-                'success' => true,
-                'pago_procesado' => false, // El pago NO se completó automáticamente
-                'tipo_respuesta' => 'instrucciones_pago_manual',
-                'mensaje' => 'Orden creada exitosamente. Por favor, sigue las instrucciones para completar el pago con Transfermóvil.',
-                'orden' => [
-                    'id' => $id_orden,
-                    'numero' => $numero_orden,
-                    'referencia' => $referencia_pago,
-                    'total' => $total,
-                    'estado_pago' => 'pendiente'
-                ],
-                'instrucciones' => [
-                    'metodo' => 'Transfermóvil',
-                    'numero_tarjeta' => $configTM['transfermovil_numero_tarjeta'],
-                    'nombre_titular' => $configTM['transfermovil_nombre_titular'],
-                    'referencia' => $referencia_pago,
-                    'pasos' => [
-                        '1. Abre la aplicación Transfermóvil.',
-                        '2. Selecciona "Transferir" o "Pagar".',
-                        '3. Ingresa este número de tarjeta: 9201123456789012',
-                        '4. Introduce el monto exacto: ' . number_format($total, 2) . ' CUP.',
-                        '5. En el CONCEPTO, escribe esta referencia: ' . $referencia_pago,
-                        '6. Confirma la transferencia y guarda el comprobante.',
-                        '7. Tu pedido se procesará una vez verifiquemos el pago.'
-                    ]
-                ]
+        // 6. CREAR DETALLES DE LA ORDEN (para TODOS los métodos de pago, incluyendo transfermovil)
+try {
+    // 6.A Mover items del carrito a orden_detalle
+    foreach ($items_seleccionados as $item_id) {
+        // Obtener datos del producto en el carrito
+        $sql_carrito = "SELECT c.cantidad, c.id_producto_tienda, c.precio_unitario, pt.id_producto
+                       FROM carrito c
+                       JOIN producto_tienda pt ON c.id_producto_tienda = pt.id
+                       WHERE c.id = :item_id AND c.id_usuario = :id_usuario";
+        
+        $query = $orden->acceso->prepare($sql_carrito);
+        $query->execute([':item_id' => $item_id, ':id_usuario' => $id_usuario]);
+        $producto_carrito = $query->fetch();
+        
+        if ($producto_carrito) {
+            // Insertar en orden_detalle
+            $sql_detalle = "INSERT INTO orden_detalle 
+                           (id_orden, id_producto, id_producto_tienda, cantidad, precio_unitario, total)
+                           VALUES (:id_orden, :id_producto, :id_producto_tienda, :cantidad, :precio_unitario, 
+                                   :cantidad * :precio_unitario)";
+            
+            $query_detalle = $orden->acceso->prepare($sql_detalle);
+            $query_detalle->execute([
+                ':id_orden' => $id_orden,
+                ':id_producto' => $producto_carrito->id_producto,
+                ':id_producto_tienda' => $producto_carrito->id_producto_tienda,
+                ':cantidad' => $producto_carrito->cantidad,
+                ':precio_unitario' => $producto_carrito->precio_unitario
             ]);
-            // exit(); // 🛑 SALIMOS AQUÍ. NO se ejecuta el flujo automático.
+            
+            // 6.B Actualizar stock del producto
+            $sql_update_stock = "UPDATE producto_tienda 
+                                SET stock = stock - :cantidad,
+                                    unidades_vendidas = unidades_vendidas + :cantidad
+                                WHERE id = :id_producto_tienda";
+            
+            $query_stock = $orden->acceso->prepare($sql_update_stock);
+            $query_stock->execute([
+                ':cantidad' => $producto_carrito->cantidad,
+                ':id_producto_tienda' => $producto_carrito->id_producto_tienda
+            ]);
+        }
+    }
+    
+    // 6.C Eliminar items del carrito (solo los procesados)
+    $placeholders = str_repeat('?,', count($items_seleccionados) - 1) . '?';
+    $sql_eliminar_carrito = "DELETE FROM carrito 
+                            WHERE id IN ($placeholders) AND id_usuario = ?";
+    
+    $params = array_merge($items_seleccionados, [$id_usuario]);
+    $query_eliminar = $orden->acceso->prepare($sql_eliminar_carrito);
+    $query_eliminar->execute($params);
+    
+} catch (Exception $e) {
+    // Si hay error, hacer rollback de toda la transacción
+    $orden->acceso->rollBack();
+    throw new Exception("Error al procesar detalles de la orden: " . $e->getMessage());
+}
 
+// 7. DECIDIR EL FLUJO SEGÚN EL MÉTODO DE PAGO (MODIFICADO)
+if ($metodo_pago_codigo === 'transfermovil') {
+    // 🎯 FLUJO PARA PAGO MANUAL CON TRANSFERMÓVIL
+    // Los items YA SE PROCESARON, el stock YA SE ACTUALIZÓ, el carrito YA SE VACIÓ
+    
+    // 7.A Obtener configuración de Transfermóvil
+    $configTM = $metodo_pago->obtenerConfiguracionTransfermovil();
+    
+    if (!$configTM || !$configTM['activo']) {
+        // IMPORTANTE: Si Transfermóvil no está activo, debemos revertir lo procesado
+        $orden->acceso->rollBack();
+        throw new Exception('El método de pago Transfermóvil no está disponible en este momento.');
+    }
+    
+    // 7.B Respuesta ESPECIAL con instrucciones
+    echo json_encode([
+        'success' => true,
+        'pago_procesado' => false, // El pago NO se completó automáticamente
+        'id_orden' => $id_orden,
+        'numero_orden' => $numero_orden,
+        'referencia_pago' => $referencia_pago,
+        'metodo_pago' => 'transfermovil',
+        'mensaje' => 'Orden creada exitosamente. Ahora realiza la transferencia bancaria.',
+        'instrucciones' => [
+            'banco' => $configTM['banco'] ?? 'Banco Popular de Ahorro',
+            'cuenta' => $configTM['cuenta'] ?? '9238********5406',
+            'titular' => $configTM['titular'] ?? 'NexusBuy S.A.',
+            'monto' => number_format($total, 2),
+            'referencia' => $referencia_pago ?? $numero_orden
+        ]
+    ]);
+
+            
         } else {
             // ======= FLUJO ORIGINAL PARA PAGOS AUTOMÁTICOS =======
             // 6.C PROCESAR ITEMS (CÓDIGO ORIGINAL - PEGA AQUÍ LO QUE SIGUE EN TU ARCHIVO)
             $items_procesados = 0;
-
+            
             foreach ($items_seleccionados as $item_id) {
                 $sql_item = "SELECT c.*, pt.precio, pt.descuento_porcentaje, pt.id as id_producto_tienda, 
                             (pt.precio - (pt.precio * pt.descuento_porcentaje / 100)) as precio_final,
@@ -408,23 +457,23 @@ if ($_POST['funcion'] == 'procesar_pago') {
                             JOIN producto_tienda pt ON c.id_producto_tienda = pt.id
                             JOIN producto p ON pt.id_producto = p.id
                             WHERE c.id = :item_id AND c.id_usuario = :id_usuario";
-
+                
                 $query = $orden->acceso->prepare($sql_item);
                 $query->execute([':item_id' => $item_id, ':id_usuario' => $id_usuario]);
                 $item = $query->fetch();
-
+                
                 if (!$item) {
                     continue;
                 }
-
+                
                 $precio_unitario = $item->precio;
                 $descuento_porcentaje = $item->descuento_porcentaje;
                 $precio_final = $item->precio_final;
                 $cantidad = $item->cantidad;
                 $subtotal_item = $precio_final * $cantidad;
-                $descuento_unitario = ($descuento_porcentaje > 0) ?
+                $descuento_unitario = ($descuento_porcentaje > 0) ? 
                     ($precio_unitario * $descuento_porcentaje / 100) : 0;
-
+                
                 // Agregar a orden_detalle
                 $detalle_ok = $orden->agregar_detalle_orden(
                     $id_orden,
@@ -434,11 +483,11 @@ if ($_POST['funcion'] == 'procesar_pago') {
                     $descuento_unitario,
                     $subtotal_item
                 );
-
+                
                 if ($detalle_ok) {
                     // 6.D ACTUALIZAR STOCK (CÓDIGO ORIGINAL)
                     $stock_actualizado = $orden->actualizar_stock($item->id_producto_tienda, $cantidad);
-
+                    
                     if ($stock_actualizado) {
                         // 6.E ELIMINAR DEL CARRITO (CÓDIGO ORIGINAL)
                         $carrito->eliminar_del_carrito($item_id, $id_usuario);
@@ -446,7 +495,7 @@ if ($_POST['funcion'] == 'procesar_pago') {
                     }
                 }
             }
-
+            
             // 7. RESPUESTA FINAL PARA PAGOS AUTOMÁTICOS (CÓDIGO ORIGINAL)
             echo json_encode([
                 'success' => true,
@@ -460,6 +509,7 @@ if ($_POST['funcion'] == 'procesar_pago') {
                 ]
             ]);
         }
+        
     } catch (Exception $e) {
         // CÓDIGO ORIGINAL DEL CATCH
         echo json_encode([
