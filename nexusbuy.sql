@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-02-2026 a las 04:03:32
+-- Tiempo de generación: 13-02-2026 a las 00:22:04
 -- Versión del servidor: 10.4.17-MariaDB
 -- Versión de PHP: 7.4.15
 
@@ -192,6 +192,39 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `banners`
+--
+
+CREATE TABLE `banners` (
+  `id` int(11) NOT NULL,
+  `titulo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `imagen` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'default_banner.jpg',
+  `url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT '#',
+  `posicion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'slider_principal, lateral_derecho, superior, inferior, categorias, popup',
+  `orden` int(11) DEFAULT 0,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date NOT NULL,
+  `estado` tinyint(1) DEFAULT 1 COMMENT '1=Activo, 0=Inactivo',
+  `texto_boton` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT 'Ver más',
+  `icono_boton` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'fa-shopping-cart',
+  `id_usuario` int(11) NOT NULL,
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
+  `fecha_actualizacion` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `banners`
+--
+
+INSERT INTO `banners` (`id`, `titulo`, `descripcion`, `imagen`, `url`, `posicion`, `orden`, `fecha_inicio`, `fecha_fin`, `estado`, `texto_boton`, `icono_boton`, `id_usuario`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 'Ofertas de Verano', 'Hasta 50% de descuento en productos seleccionados. Aprovecha estas ofertas por tiempo limitado.', 'Banner 1.jpg', 'Views/ofertas.php', 'slider_principal', 1, '2026-02-12', '2026-03-14', 0, 'Ver Ofertas', 'fa-tag', 1, '2026-02-12 01:57:31', '2026-02-12 02:20:33'),
+(2, 'Envío Gratis', 'En todas tus compras. Disfruta de envío rápido y seguro a todo el país.', 'Banner 2.jpg', 'Views/producto.php', 'slider_principal', 2, '2026-02-12', '2026-03-14', 1, 'Comprar Ahora', 'fa-truck', 1, '2026-02-12 01:57:31', '2026-02-12 01:59:59'),
+(3, 'Nuevos Productos', 'Descubre nuestra última colección de productos exclusivos. Tecnología innovadora al mejor precio.', 'Banner 3.jpg', 'Views/producto.php?filtro=nuevos', 'slider_principal', 3, '2026-02-12', '2026-03-14', 1, 'Explorar', 'fa-star', 1, '2026-02-12 01:57:31', '2026-02-12 02:13:25');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `bundle`
 --
 
@@ -268,13 +301,6 @@ CREATE TABLE `carrito` (
   `fecha_agregado` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `carrito`
---
-
-INSERT INTO `carrito` (`id`, `id_usuario`, `session_id`, `id_producto_tienda`, `cantidad`, `fecha_agregado`, `fecha_actualizacion`) VALUES
-(39, 2, NULL, 5, 1, '2026-01-24 20:36:22', '2026-01-24 20:36:22');
 
 -- --------------------------------------------------------
 
@@ -735,7 +761,44 @@ INSERT INTO `historial` (`id`, `id_usuario`, `accion`, `modulo`, `descripcion`, 
 (18, 2, 'eliminar_direccion', '', 'Ha eliminado la Dirección: Lois, Municipio: Centro Habana, Provincia: La Habana', NULL, NULL, NULL, '2025-12-17 05:51:17', 3, 3),
 (19, 2, 'crear_direccion', '', 'Ha creado una nueva dirección: Neptuno #616 / Gervacio y Escobar', NULL, NULL, NULL, '2025-12-17 18:25:11', 1, 3),
 (20, 2, 'eliminar_direccion', '', 'Ha eliminado la Dirección: Neptuno #616B /Gervacio y Escobar, Municipio: Centro Habana, Provincia: La Habana', NULL, NULL, NULL, '2025-12-17 18:25:25', 3, 3),
-(21, 2, 'crear_direccion', '', 'Ha creado una nueva dirección: Calle 26', NULL, NULL, NULL, '2025-12-18 04:21:14', 1, 3);
+(21, 2, 'crear_direccion', '', 'Ha creado una nueva dirección: Calle 26', NULL, NULL, NULL, '2025-12-18 04:21:14', 1, 3),
+(22, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559903 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:06:53', 6, 13),
+(23, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559904 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:08:33', 6, 13),
+(24, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559905 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:09:41', 6, 13),
+(25, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559906 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:11:06', 6, 13),
+(26, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559907 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:13:47', 6, 13),
+(27, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559911 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:15:37', 6, 13),
+(28, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559912 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:25:23', 6, 14),
+(29, 2, 'transferencia_registrada', '', 'Transf. registrada: ', NULL, NULL, NULL, '2026-02-03 03:28:59', 6, 14),
+(30, 2, 'transferencia_registrada', '', 'Transf. registrada: MM603RT559915 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, NULL, '2026-02-03 03:36:30', 6, 14),
+(31, 2, 'transferencia_registrada', '', 'Transferencia registrada exitosamente 35', NULL, NULL, NULL, '2026-02-03 03:40:54', 6, 14),
+(32, 2, 'transferencia_registrada', '', 'Transferencia registrada exitosamente 36', NULL, NULL, NULL, '2026-02-03 03:42:40', 6, 14),
+(33, 2, 'transferencia_registrada', '', 'Transferencia registrada exitosamente', NULL, NULL, NULL, '2026-02-03 03:44:12', 6, 14),
+(34, 2, 'transferencia_registrada', '', 'Transferencia registrada exitosamente', NULL, NULL, NULL, '2026-02-03 03:46:57', 6, 14),
+(35, 2, 'transferencia_registrada', '', 'Transferencia registrada: MM603RT559920 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, '{\"orden_id\":235,\"transferencia_id\":\"39\",\"numero_transaccion\":\"MM603RT559920\",\"monto\":112500,\"banco\":\"Banco Metropolitano\",\"fecha\":\"2026-02-02\"}', '2026-02-03 03:53:40', 6, 14),
+(36, 2, 'transferencia_registrada', '', 'Transferencia registrada: MM603RT559922 - Banco: Banco Metropolitano - Monto: $112500', NULL, NULL, '{\"orden_id\":236,\"transferencia_id\":\"40\",\"numero_transaccion\":\"MM603RT559922\",\"monto\":112500,\"banco\":\"Banco Metropolitano\",\"fecha\":\"2026-02-02\"}', '2026-02-03 04:31:53', 6, 14),
+(37, 2, 'transferencia_registrada', '', 'Transferencia registrada exitosamente', NULL, NULL, NULL, '2026-02-05 01:33:21', 6, 14),
+(38, 2, 'transferencia_registrada', '', 'Pago realizado exitosamente', NULL, NULL, NULL, '2026-02-05 02:32:43', 6, 14),
+(39, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 02:47:08', 6, 14),
+(40, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 02:53:59', 6, 14),
+(41, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 02:56:42', 6, 14),
+(42, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 02:58:20', 6, 14),
+(43, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 03:01:26', 6, 14),
+(44, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 04:43:34', 6, 14),
+(45, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 05:14:25', 6, 14),
+(46, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-05 05:17:16', 6, 14),
+(47, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:14:55', 6, 14),
+(48, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:24:08', 6, 14),
+(49, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:25:05', 6, 14),
+(50, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:30:35', 6, 14),
+(51, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:31:03', 6, 14),
+(52, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:31:58', 6, 14),
+(53, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-07 22:35:32', 6, 14),
+(54, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-08 00:28:22', 6, 14),
+(55, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente', NULL, NULL, NULL, '2026-02-08 02:03:15', 6, 14),
+(56, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente. Stock actualizado para 1 productos', NULL, NULL, NULL, '2026-02-08 02:55:13', 6, 14),
+(57, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente. Stock actualizado para 1 productos', NULL, NULL, NULL, '2026-02-08 02:57:27', 6, 14),
+(58, 2, 'transferencia_registrada', '', 'Transferencia realizada exitosamente. Stock actualizado para 1 productos', NULL, NULL, NULL, '2026-02-08 03:03:22', 6, 14);
 
 -- --------------------------------------------------------
 
@@ -800,7 +863,16 @@ CREATE TABLE `logs_pagos` (
 --
 
 INSERT INTO `logs_pagos` (`id`, `orden_id`, `accion`, `detalles`, `usuario_id`, `ip_address`, `user_agent`, `fecha`) VALUES
-(1, 1, 'referencia_generada', 'Referencia: NEXUS-001-20260107-0001 | Hash: 0f1aa8efcf602e52', 2, NULL, NULL, '2026-01-07 19:18:10');
+(1, 1, 'referencia_generada', 'Referencia: NEXUS-001-20260107-0001 | Hash: 0f1aa8efcf602e52', 2, NULL, NULL, '2026-01-07 19:18:10'),
+(2, 271, 'transferencia_registrada', 'Transacción: MM603RT559954 | Monto: $2160 | Banco: Banco Metropolitano', 2, NULL, NULL, '2026-02-05 04:43:34'),
+(3, 272, 'transferencia_registrada', 'Transacción: MM603RT559955 | Monto: $48560 | Banco: Banco Metropolitano', 2, NULL, NULL, '2026-02-05 05:14:25'),
+(4, 273, 'transferencia_registrada', 'Transacción: MM603RT559956 | Monto: $2160 | Banco: Banco Metropolitano', 2, NULL, NULL, '2026-02-05 05:17:16'),
+(11, 302, 'transferencia_registrada', 'Transacción: MM603RT559960 | Monto: $2160 | Banco: Banco Metropolitano', 2, NULL, NULL, '2026-02-07 22:35:32'),
+(12, 310, 'transferencia_registrada', 'Transacción: MM603RT559961 | Monto: $2160 | Banco: Banco Metropolitano', 2, NULL, NULL, '2026-02-08 00:28:21'),
+(13, 315, 'transferencia_registrada', 'Transacción: MM603RT559964 | Monto: $2160 | Banco: Banco Metropolitano', 2, NULL, NULL, '2026-02-08 02:03:15'),
+(14, 317, 'transferencia_registrada', 'Transacción: MM603RT559965 | Monto: $2160 | Banco: Banco Metropolitano | Stock actualizado', 2, NULL, NULL, '2026-02-08 02:55:13'),
+(15, 318, 'transferencia_registrada', 'Transacción: MM603RT559966 | Monto: $15120 | Banco: Banco Metropolitano | Stock actualizado', 2, NULL, NULL, '2026-02-08 02:57:27'),
+(16, 319, 'transferencia_registrada', 'Transacción: MM603RT559967 | Monto: $2160 | Banco: Banco Metropolitano | Stock actualizado', 2, NULL, NULL, '2026-02-08 03:03:22');
 
 -- --------------------------------------------------------
 
@@ -1010,7 +1082,8 @@ INSERT INTO `modulo` (`id`, `nombre`, `icono`, `estado`, `fecha_creacion`) VALUE
 (10, 'Configuración', '<i class=\"fas fa-cogs\"></i>', 'activo', '2025-12-14 18:35:26'),
 (11, 'Productos', '<i class=\"fas fa-box\"></i>', 'activo', '2025-12-14 18:35:26'),
 (12, 'Tienda', '<i class=\"fas fa-store\"></i>', 'activo', '2025-12-14 18:35:26'),
-(13, 'Notificaciones', 'fas fa-bell', 'activo', '2025-12-14 18:35:26');
+(13, 'Notificaciones', '<i class=\"fas fa-bell\"></i>', 'activo', '2025-12-14 18:35:26'),
+(14, 'Transfermóvil', '<i class=\"fas fa-mobile-alt\"></i>', 'activo', '2026-02-03 02:50:54');
 
 -- --------------------------------------------------------
 
@@ -1312,7 +1385,7 @@ CREATE TABLE `orden` (
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `metodo_pago_codigo` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT 'efectivo' COMMENT 'Código del método (ej: transfermovil, efectivo)',
   `referencia_pago` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Referencia única generada para este pago (ej: NEXUS-001)',
-  `estado_pago` enum('pendiente','verificado','rechazado','cancelado') COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
+  `estado_pago` enum('pendiente','verificado','rechazado','cancelado','procesando_verificacion') COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
   `comprobante_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ruta al archivo del comprobante subido por el cliente',
   `fecha_pago` datetime DEFAULT NULL,
   `fecha_verificacion` datetime DEFAULT NULL,
@@ -1453,7 +1526,151 @@ INSERT INTO `orden` (`id`, `numero_orden`, `id_usuario`, `id_direccion_envio`, `
 (169, 'ORD-20260202-698006447DE04', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 02:04:52', '2026-02-02 02:04:52', 'transfermovil', 'NX-20260202-F28C71', 'pendiente', NULL, NULL, NULL, NULL, NULL),
 (170, 'ORD-20260202-6980078E83C62', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 02:10:22', '2026-02-02 02:10:22', 'transfermovil', 'NX-20260202-317F26', 'pendiente', NULL, NULL, NULL, NULL, NULL),
 (171, 'ORD-20260202-698007DE833BA', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 02:11:42', '2026-02-02 02:11:42', 'transfermovil', 'NX-20260202-809BD6', 'pendiente', NULL, NULL, NULL, NULL, NULL),
-(172, 'ORD-20260202-6980092F7EF88', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 02:17:19', '2026-02-02 02:17:19', 'transfermovil', 'NX-20260202-81D4C0', 'pendiente', NULL, NULL, NULL, NULL, NULL);
+(172, 'ORD-20260202-6980092F7EF88', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 02:17:19', '2026-02-02 02:17:19', 'transfermovil', 'NX-20260202-81D4C0', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(173, 'ORD-20260202-698017789940B', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:18:16', '2026-02-02 03:18:16', 'transfermovil', 'NX-20260202-F38406', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(174, 'ORD-20260202-698019914A586', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:27:13', '2026-02-02 03:27:13', 'transfermovil', 'NX-20260202-E81926', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(175, 'ORD-20260202-698019DF9BC23', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:28:31', '2026-02-02 03:28:31', 'transfermovil', 'NX-20260202-8F45DE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(176, 'ORD-20260202-69801A0747F0E', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:29:11', '2026-02-02 03:29:11', 'transfermovil', 'NX-20260202-162B3B', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(177, 'ORD-20260202-69801AF1487C7', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:33:05', '2026-02-02 03:33:05', 'transfermovil', 'NX-20260202-827CFA', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(178, 'ORD-20260202-69801EEEA9F03', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:50:06', '2026-02-02 03:50:06', 'transfermovil', 'NX-20260202-C1F155', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(179, 'ORD-20260202-698020E7DB6B7', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 03:58:31', '2026-02-02 03:58:31', 'transfermovil', 'NX-20260202-E4A2A7', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(180, 'ORD-20260202-6980238FB4C42', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:09:51', '2026-02-02 04:09:51', 'transfermovil', 'NX-20260202-0563A4', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(181, 'ORD-20260202-6980258A8EAED', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:18:18', '2026-02-02 04:18:18', 'transfermovil', 'NX-20260202-04A5AD', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(182, 'ORD-20260202-698028449E321', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:29:56', '2026-02-02 04:29:56', 'transfermovil', 'NX-20260202-E718ED', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(183, 'ORD-20260202-69802C5BE21EE', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:47:23', '2026-02-02 04:47:23', 'transfermovil', 'NX-20260202-9F19FB', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(184, 'ORD-20260202-69802D15B51CF', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:50:34', '2026-02-02 04:50:34', 'transfermovil', 'NX-20260202-6AF41A', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(185, 'ORD-20260202-69802D53C51DA', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:51:32', '2026-02-02 04:51:32', 'transfermovil', 'NX-20260202-0E60B6', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(186, 'ORD-20260202-69802EE47E821', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 04:58:12', '2026-02-02 04:58:12', 'transfermovil', 'NX-20260202-D7D41B', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(187, 'ORD-20260202-6980322525563', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 05:12:05', '2026-02-02 05:12:05', 'transfermovil', 'NX-20260202-A10A65', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(188, 'ORD-20260202-698032498E9FC', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 05:12:41', '2026-02-02 05:12:41', 'transfermovil', 'NX-20260202-2238E4', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(189, 'ORD-20260202-6980329CD75D3', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 05:14:05', '2026-02-02 05:14:05', 'transfermovil', 'NX-20260202-802261', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(190, 'ORD-20260202-69803462947F8', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 05:21:38', '2026-02-02 05:21:38', 'transfermovil', 'NX-20260202-3F884C', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(191, 'ORD-20260202-6980BCC36787F', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 15:03:31', '2026-02-02 15:03:31', 'transfermovil', 'NX-20260202-BB1068', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(192, 'ORD-20260202-6980BD386B532', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 15:05:28', '2026-02-02 15:05:28', 'transfermovil', 'NX-20260202-BCF86F', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(193, 'ORD-20260202-6980C1273933A', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 15:22:15', '2026-02-02 15:22:15', 'transfermovil', 'NX-20260202-6AC651', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(194, 'ORD-20260202-6980C1A31D8C6', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 15:24:19', '2026-02-02 15:24:19', 'transfermovil', 'NX-20260202-B7979E', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(195, 'ORD-20260202-6980C990DA6FC', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 15:58:08', '2026-02-02 15:58:08', 'transfermovil', 'NX-20260202-EEEF55', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(196, 'ORD-20260202-6980CA25AF9C9', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 16:00:37', '2026-02-02 16:00:37', 'transfermovil', 'NX-20260202-089653', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(197, 'ORD-20260202-6980CCAD1B38E', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559987 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 16:11:25', '2026-02-02 16:11:48', 'transfermovil', 'NX-20260202-A0221C', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(198, 'ORD-20260202-6980D02A8B4F4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 16:26:18', '2026-02-02 16:26:18', 'transfermovil', 'NX-20260202-B6C17D', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(199, 'ORD-20260202-6980D0652451B', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 16:27:17', '2026-02-02 16:27:17', 'transfermovil', 'NX-20260202-30F0F7', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(200, 'ORD-20260202-6980D0E0776A6', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559988 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 16:29:20', '2026-02-02 16:29:33', 'transfermovil', 'NX-20260202-505402', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(201, 'ORD-20260202-6980D35765FE2', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559989 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 16:39:51', '2026-02-02 16:40:08', 'transfermovil', 'NX-20260202-F06764', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(202, 'ORD-20260202-6980D5C951CE4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559990 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 16:50:17', '2026-02-02 16:50:36', 'transfermovil', 'NX-20260202-36B520', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(203, 'ORD-20260202-6980D65C45436', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 16:52:44', '2026-02-02 16:52:44', 'transfermovil', 'NX-20260202-1BABBB', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(204, 'ORD-20260202-6980D69704115', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559991 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 16:53:43', '2026-02-02 16:54:24', 'transfermovil', 'NX-20260202-B6405F', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(205, 'ORD-20260202-6980D71B72BE4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 16:55:55', '2026-02-02 16:55:55', 'transfermovil', 'NX-20260202-9A9A8E', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(206, 'ORD-20260202-6980D77A5D4A6', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559992 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 16:57:30', '2026-02-02 16:57:49', 'transfermovil', 'NX-20260202-CCF4C5', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(207, 'ORD-20260202-6980D981121B6', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-02 17:06:10', '2026-02-02 17:06:10', 'transfermovil', 'NX-20260202-7B7410', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(208, 'ORD-20260202-6980DA31BC342', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559993 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 17:09:06', '2026-02-02 17:09:52', 'transfermovil', 'NX-20260202-582FBA', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(209, 'ORD-20260202-6980DAED2DF60', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559994 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 17:12:13', '2026-02-02 17:12:26', 'transfermovil', 'NX-20260202-953C4A', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(210, 'ORD-20260202-6980E26BA2D8D', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559995 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 17:44:11', '2026-02-02 17:44:35', 'transfermovil', 'NX-20260202-69DE72', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(211, 'ORD-20260202-6980E36B77FF3', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559996 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 17:48:27', '2026-02-02 17:48:45', 'transfermovil', 'NX-20260202-ABB0AF', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(212, 'ORD-20260202-6980E5E9C4B23', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559997 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 17:59:05', '2026-02-02 17:59:23', 'transfermovil', 'NX-20260202-321E34', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(213, 'ORD-20260202-6980EA2482FB5', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559998 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 18:17:08', '2026-02-02 18:17:28', 'transfermovil', 'NX-20260202-05907F', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(214, 'ORD-20260202-6980EBE107F49', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559999 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 18:24:34', '2026-02-02 18:25:32', 'transfermovil', 'NX-20260202-B24A94', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(215, 'ORD-20260202-69810CC69B0B8', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559909 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-02 20:44:54', '2026-02-02 20:45:25', 'transfermovil', 'NX-20260202-2260FD', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(216, 'ORD-20260203-69815B203D47C', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559900 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 02:19:12', '2026-02-03 02:20:28', 'transfermovil', 'NX-20260203-6AD912', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(217, 'ORD-20260203-69815C057025B', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559901 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 02:23:01', '2026-02-03 02:23:37', 'transfermovil', 'NX-20260203-670B6A', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(218, 'ORD-20260203-69815FB96D352', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559902 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 02:38:49', '2026-02-03 02:39:07', 'transfermovil', 'NX-20260203-4103DF', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(219, 'ORD-20260203-6981661A4DCB4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-03 03:06:02', '2026-02-03 03:06:02', 'transfermovil', 'NX-20260203-3FCAE2', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(220, 'ORD-20260203-69816642023E4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559903 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:06:42', '2026-02-03 03:06:53', 'transfermovil', 'NX-20260203-18D029', 'pendiente', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `orden` (`id`, `numero_orden`, `id_usuario`, `id_direccion_envio`, `id_metodo_pago`, `estado`, `subtotal`, `descuento`, `costo_envio`, `impuestos`, `total`, `codigo_seguimiento`, `fecha_entrega_estimada`, `fecha_entrega_real`, `notas_cliente`, `notas_internas`, `fecha_creacion`, `fecha_actualizacion`, `metodo_pago_codigo`, `referencia_pago`, `estado_pago`, `comprobante_url`, `fecha_pago`, `fecha_verificacion`, `verificado_por`, `hash_verificacion`) VALUES
+(221, 'ORD-20260203-698166853B042', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, NULL, '2026-02-03 03:07:49', '2026-02-03 03:07:49', 'transfermovil', 'NX-20260203-DFB749', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(222, 'ORD-20260203-698166A7885CB', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559904 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:08:23', '2026-02-03 03:08:33', 'transfermovil', 'NX-20260203-BEF4DB', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(223, 'ORD-20260203-698166EB4E3FC', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559905 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:09:31', '2026-02-03 03:09:41', 'transfermovil', 'NX-20260203-68DC36', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(224, 'ORD-20260203-6981673527D84', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559906 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:10:45', '2026-02-03 03:11:06', 'transfermovil', 'NX-20260203-A4A53D', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(225, 'ORD-20260203-698167E0E4F5C', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559907 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:13:37', '2026-02-03 03:13:47', 'transfermovil', 'NX-20260203-0896A3', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(226, 'ORD-20260203-6981684F7D0A8', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559911 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:15:28', '2026-02-03 03:15:37', 'transfermovil', 'NX-20260203-3BE40D', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(227, 'ORD-20260203-69816A987BFC4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559912 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:25:12', '2026-02-03 03:25:23', 'transfermovil', 'NX-20260203-90671E', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(228, 'ORD-20260203-69816B7179569', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559913 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:28:50', '2026-02-03 03:28:59', 'transfermovil', 'NX-20260203-E22108', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(229, 'ORD-20260203-69816BD35A032', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559914 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:30:27', '2026-02-03 03:30:38', 'transfermovil', 'NX-20260203-A41BBD', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(230, 'ORD-20260203-69816D30CF275', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559915 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:36:16', '2026-02-03 03:36:30', 'transfermovil', 'NX-20260203-8AFC94', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(231, 'ORD-20260203-69816E3CE5AB4', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559916 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:40:44', '2026-02-03 03:40:54', 'transfermovil', 'NX-20260203-228F11', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(232, 'ORD-20260203-69816EA4A75B3', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559917 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:42:28', '2026-02-03 03:42:40', 'transfermovil', 'NX-20260203-E1FB24', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(233, 'ORD-20260203-69816F02F2DD6', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559918 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:44:03', '2026-02-03 03:44:12', 'transfermovil', 'NX-20260203-995F30', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(234, 'ORD-20260203-69816FA6BB08E', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559919 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:46:46', '2026-02-03 03:46:56', 'transfermovil', 'NX-20260203-63C2E8', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(235, 'ORD-20260203-6981713760808', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559920 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 03:53:27', '2026-02-03 03:53:39', 'transfermovil', 'NX-20260203-806290', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(236, 'ORD-20260203-69817A2DF40A9', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559922 | Monto: $112500 | Fecha: 2026-02-02 | Banco: Banco Metropolitano', '2026-02-03 04:31:42', '2026-02-03 04:31:53', 'transfermovil', 'NX-20260203-F94560', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(237, 'ORD-20260205-6983EDC343A02', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559923 | Monto: $112500 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 01:09:23', '2026-02-05 01:09:35', 'transfermovil', 'NX-20260205-3DE7CE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(238, 'ORD-20260205-6983EF049013C', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559924 | Monto: $112500 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 01:14:44', '2026-02-05 01:14:55', 'transfermovil', 'NX-20260205-D5BFE3', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(239, 'ORD-20260205-6983F205D2C66', 2, 5, NULL, 'pendiente', '126000.00', '0.00', '2250.00', '0.00', '112500.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559925 | Monto: $112500 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 01:27:33', '2026-02-05 01:27:44', 'transfermovil', 'NX-20260205-2DE93D', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(240, 'ORD-20260205-6983F348CD621', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559926 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 01:32:56', '2026-02-05 01:33:20', 'transfermovil', 'NX-20260205-A57FF3', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(241, 'ORD-20260205-6983F3B92828D', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559927 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 01:34:49', '2026-02-05 01:34:59', 'transfermovil', 'NX-20260205-DB4212', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(242, 'ORD-20260205-6983F47EAE6ED', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559928 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 01:38:06', '2026-02-05 01:38:16', 'transfermovil', 'NX-20260205-02904A', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(243, 'ORD-20260205-6983FB345C451', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559929 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:06:44', '2026-02-05 02:07:03', 'transfermovil', 'NX-20260205-C8D3CC', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(244, 'ORD-20260205-6983FD544970A', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559930 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:15:48', '2026-02-05 02:15:59', 'transfermovil', 'NX-20260205-CCB231', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(245, 'ORD-20260205-6983FEEFDCD93', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559931 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:22:40', '2026-02-05 02:23:11', 'transfermovil', 'NX-20260205-F88DD5', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(246, 'ORD-20260205-6984013E9ACF4', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559932 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:32:30', '2026-02-05 02:32:43', 'transfermovil', 'NX-20260205-DDFFFB', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(247, 'ORD-20260205-698401A687B50', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559933 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:34:14', '2026-02-05 02:34:24', 'transfermovil', 'NX-20260205-83B7D9', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(248, 'ORD-20260205-69840257ABD35', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559934 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:37:11', '2026-02-05 02:37:25', 'transfermovil', 'NX-20260205-CF87F1', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(249, 'ORD-20260205-6984038BEE82D', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559935 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:42:20', '2026-02-05 02:42:31', 'transfermovil', 'NX-20260205-328AC7', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(250, 'ORD-20260205-69840468A1EF0', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, NULL, '2026-02-05 02:46:00', '2026-02-05 02:46:00', 'transfermovil', 'NX-20260205-94F095', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(251, 'ORD-20260205-698404952CDF9', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559936 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:46:45', '2026-02-05 02:47:08', 'transfermovil', 'NX-20260205-EC5BC2', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(252, 'ORD-20260205-6984063C647DB', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559937 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:53:49', '2026-02-05 02:53:59', 'transfermovil', 'NX-20260205-64F266', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(253, 'ORD-20260205-698406D52050E', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559938 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:56:21', '2026-02-05 02:56:41', 'transfermovil', 'NX-20260205-71BB62', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(254, 'ORD-20260205-69840741A6BAB', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559939 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:58:09', '2026-02-05 02:58:20', 'transfermovil', 'NX-20260205-1E90E4', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(255, 'ORD-20260205-698407A2EDF35', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559940 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 02:59:46', '2026-02-05 02:59:57', 'transfermovil', 'NX-20260205-3176CF', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(256, 'ORD-20260205-698407FB0D3FB', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559941 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:01:15', '2026-02-05 03:01:26', 'transfermovil', 'NX-20260205-A0356B', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(257, 'ORD-20260205-69840851A20EE', 2, 5, NULL, 'pendiente', '1800.00', '0.00', '2700.00', '0.00', '4320.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559942 | Monto: $4320 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:02:41', '2026-02-05 03:03:01', 'transfermovil', 'NX-20260205-B71FAD', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(258, 'ORD-20260205-69840AF0D8479', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-05 03:13:52', '2026-02-05 03:13:52', 'transfermovil', 'NX-20260205-EBB6A4', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(259, 'ORD-20260205-69840B4B8D752', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559943 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:15:24', '2026-02-05 03:15:34', 'transfermovil', 'NX-20260205-4B08CE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(260, 'ORD-20260205-69840C0942D2F', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559944 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:18:33', '2026-02-05 03:18:44', 'transfermovil', 'NX-20260205-BA0032', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(261, 'ORD-20260205-69840C894EE72', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559945 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:20:41', '2026-02-05 03:20:51', 'transfermovil', 'NX-20260205-4E3ABA', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(262, 'ORD-20260205-69840E2F1F734', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559946 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:27:43', '2026-02-05 03:27:54', 'transfermovil', 'NX-20260205-62F044', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(263, 'ORD-20260205-6984106DEEE31', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559947 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:37:17', '2026-02-05 03:37:27', 'transfermovil', 'NX-20260205-603A04', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(264, 'ORD-20260205-69841254A7993', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559948 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:45:24', '2026-02-05 03:45:34', 'transfermovil', 'NX-20260205-4E0879', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(265, 'ORD-20260205-698412D2877EC', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559949 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:47:30', '2026-02-05 03:47:40', 'transfermovil', 'NX-20260205-5A5B0C', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(266, 'ORD-20260205-6984132FF06D1', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559950 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 03:49:03', '2026-02-05 03:49:13', 'transfermovil', 'NX-20260205-39A519', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(267, 'ORD-20260205-69841CCD59841', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559951 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 04:30:05', '2026-02-05 04:30:17', 'transfermovil', 'NX-20260205-BB4B01', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(268, 'ORD-20260205-69841DCDA665A', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-05 04:34:22', '2026-02-05 04:34:22', 'transfermovil', 'NX-20260205-ED71D6', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(269, 'ORD-20260205-69841EFA7C372', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-05 04:39:22', '2026-02-05 04:39:22', 'transfermovil', 'NX-20260205-CC9E45', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(270, 'ORD-20260205-69841F5E16C19', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-05 04:41:02', '2026-02-05 04:41:02', 'transfermovil', 'NX-20260205-C57FDA', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(271, 'ORD-20260205-69841FE561FE8', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559954 | Monto: $2160 | Fecha: 2026-02-04 | Banco: Banco Metropolitano', '2026-02-05 04:43:17', '2026-02-05 04:43:34', 'transfermovil', 'NX-20260205-B958F5', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(272, 'ORD-20260205-69842714D0CD5', 2, 5, NULL, 'pendiente', '69900.00', '0.00', '6200.00', '0.00', '48560.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559955 | Monto: $48560 | Fecha: 2026-02-05 | Banco: Banco Metropolitano', '2026-02-05 05:13:56', '2026-02-05 05:14:25', 'transfermovil', 'NX-20260205-C9DA3E', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(273, 'ORD-20260205-698427D0EC488', 2, 5, NULL, 'pendiente', '900.00', '0.00', '1350.00', '0.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559956 | Monto: $2160 | Fecha: 2026-02-05 | Banco: Banco Metropolitano', '2026-02-05 05:17:04', '2026-02-05 05:17:16', 'transfermovil', 'NX-20260205-63C542', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(274, 'ORD-20260206-69855E4A67FC4', 2, 5, NULL, 'pendiente', '900.00', NULL, '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:21:46', '2026-02-06 03:21:46', 'transfermovil', 'NX-20260206-7D7C21', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(275, 'ORD-20260206-6985610970384', 2, 5, NULL, 'pendiente', '900.00', NULL, '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:33:29', '2026-02-06 03:33:29', 'transfermovil', 'NX-20260206-7704AE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(276, 'ORD-20260206-6985623CA4F85', 2, 5, NULL, 'pendiente', '900.00', NULL, '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:38:36', '2026-02-06 03:38:36', 'transfermovil', 'NX-20260206-37B70F', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(277, 'ORD-20260206-698562BEC1A1D', 2, 5, NULL, 'pendiente', '900.00', NULL, '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:40:46', '2026-02-06 03:40:46', 'transfermovil', 'NX-20260206-94362A', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(278, 'ORD-20260206-69856363B01B0', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:43:31', '2026-02-06 03:43:31', 'transfermovil', 'NX-20260206-9F9763', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(279, 'ORD-20260206-698563CB736FE', 2, 5, NULL, 'pendiente', '2.00', '90.00', '3.00', '10.00', '4.80', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:45:15', '2026-02-06 03:45:15', 'transfermovil', 'NX-20260206-099192', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(280, 'ORD-20260206-69856400258DA', 2, 5, NULL, 'pendiente', '2.00', '90.00', '3.00', '10.00', '4.80', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:46:08', '2026-02-06 03:46:08', 'transfermovil', 'NX-20260206-BE5EDE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(281, 'ORD-20260206-69856403E84CA', 2, 5, NULL, 'pendiente', '2.00', '90.00', '3.00', '10.00', '4.80', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:46:11', '2026-02-06 03:46:11', 'transfermovil', 'NX-20260206-1AB077', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(282, 'ORD-20260206-6985640D33DD2', 2, 5, NULL, 'pendiente', '2.00', '90.00', '3.00', '10.00', '4.80', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:46:21', '2026-02-06 03:46:21', 'transfermovil', 'NX-20260206-6ED203', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(283, 'ORD-20260206-698564A4AB590', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 03:48:52', '2026-02-06 03:48:52', 'transfermovil', 'NX-20260206-D9FA2F', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(284, 'ORD-20260207-698675A882331', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 23:13:44', '2026-02-06 23:13:44', 'transfermovil', 'NX-20260207-088BFB', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(285, 'ORD-20260207-698676FE27BD5', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 23:19:26', '2026-02-06 23:19:26', 'transferencia', NULL, 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(286, 'ORD-20260207-698677A5152A0', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 23:22:13', '2026-02-06 23:22:13', 'transferencia', NULL, 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(287, 'ORD-20260207-698677F883BFE', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-06 23:23:36', '2026-02-06 23:23:36', 'transfermovil', 'NX-20260207-43B864', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(293, 'ORD-20260207-6986930BDD973', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 01:19:07', '2026-02-07 01:19:07', 'transfermovil', 'NX-20260207-7223B1', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(294, 'ORD-20260207-69869343B1F1F', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 01:20:04', '2026-02-07 01:20:04', 'transfermovil', 'NX-20260207-388848', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(295, 'ORD-20260207-698693B2CC254', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 01:21:54', '2026-02-07 01:21:54', 'transfermovil', 'NX-20260207-DF2A3B', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(296, 'ORD-20260207-698695880A73D', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 01:29:44', '2026-02-07 01:29:44', 'transfermovil', 'NX-20260207-8E4D28', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(297, 'ORD-20260207-698695CEAA7AA', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 01:30:54', '2026-02-07 01:30:54', 'transfermovil', 'NX-20260207-0CEBC0', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(298, 'ORD-20260207-6987B4DF0A82F', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 21:55:43', '2026-02-07 21:55:43', 'transfermovil', 'NX-20260207-4CCFB4', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(299, 'ORD-20260207-6987B9397E5D3', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 22:14:17', '2026-02-07 22:14:17', 'transfermovil', 'NX-20260207-1456A3', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(300, 'ORD-20260207-6987BBB1945B5', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 22:24:49', '2026-02-07 22:24:49', 'transfermovil', 'NX-20260207-AECB2D', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(301, 'ORD-20260207-6987BD155AB74', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 22:30:45', '2026-02-07 22:30:45', 'transfermovil', 'NX-20260207-BB407A', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(302, 'ORD-20260207-6987BD55AE680', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559960 | Monto: $2160 | Fecha: 2026-02-07 | Banco: Banco Metropolitano', '2026-02-07 22:31:49', '2026-02-07 22:35:31', 'transfermovil', 'NX-20260207-1EAFB0', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(303, 'ORD-20260208-6987CCB416B41', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:37:24', '2026-02-07 23:37:24', 'transfermovil', 'NX-20260208-21A004', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(304, 'ORD-20260208-6987CD6B3E4B3', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:40:27', '2026-02-07 23:40:27', 'transfermovil', 'NX-20260208-284EAD', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(305, 'ORD-20260208-6987CD908B6A9', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:41:04', '2026-02-07 23:41:04', 'transfermovil', 'NX-20260208-C6A318', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(306, 'ORD-20260208-6987CDC15BC1C', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:41:53', '2026-02-07 23:41:53', 'transfermovil', 'NX-20260208-CA05F1', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(307, 'ORD-20260208-6987CF8E04502', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:49:34', '2026-02-07 23:49:34', 'transfermovil', 'NX-20260208-EEE6FD', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(308, 'ORD-20260208-6987D08BC4E44', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:53:47', '2026-02-07 23:53:47', 'transfermovil', 'NX-20260208-210758', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(309, 'ORD-20260208-6987D1909BB96', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-07 23:58:08', '2026-02-07 23:58:08', 'transfermovil', 'NX-20260208-A70EBE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(310, 'ORD-20260208-6987D325938E5', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559961 | Monto: $2160 | Fecha: 2026-02-07 | Banco: Banco Metropolitano', '2026-02-08 00:04:53', '2026-02-08 00:28:21', 'transfermovil', 'NX-20260208-8A0BE7', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(311, 'ORD-20260208-6987DD869B0CB', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-08 00:49:11', '2026-02-08 00:49:11', 'transfermovil', 'NX-20260208-989A4E', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(312, 'ORD-20260208-6987E06D7F854', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-08 01:01:33', '2026-02-08 01:01:33', 'transfermovil', 'NX-20260208-621F2B', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(313, 'ORD-20260208-6987E3247CAF3', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-08 01:13:09', '2026-02-08 01:13:09', 'transfermovil', 'NX-20260208-8EDE8F', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(314, 'ORD-20260208-6987EA19F23C0', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-08 01:42:50', '2026-02-08 01:42:50', 'transfermovil', 'NX-20260208-F2C486', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(315, 'ORD-20260208-6987EAC70B63E', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559964 | Monto: $2160 | Fecha: 2026-02-07 | Banco: Banco Metropolitano', '2026-02-08 01:45:43', '2026-02-08 02:03:15', 'transfermovil', 'NX-20260208-E21082', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(316, 'ORD-20260208-6987F42B4B582', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-08 02:25:47', '2026-02-08 02:25:47', 'transfermovil', 'NX-20260208-9B49CE', 'pendiente', NULL, NULL, NULL, NULL, NULL),
+(317, 'ORD-20260208-6987F9BFD22A7', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559965 | Monto: $2160 | Fecha: 2026-02-07 | Banco: Banco Metropolitano | Stock actualizado para 1 productos', '2026-02-08 02:49:35', '2026-02-08 02:55:13', 'transfermovil', 'NX-20260208-5BBDFC', 'procesando_verificacion', NULL, NULL, NULL, NULL, NULL),
+(318, 'ORD-20260208-6987FB7B783F1', 2, 5, NULL, 'pendiente', '6300.00', '630.00', '9450.00', '10.00', '15120.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559966 | Monto: $15120 | Fecha: 2026-02-07 | Banco: Banco Metropolitano | Stock actualizado para 1 productos', '2026-02-08 02:56:59', '2026-02-08 02:57:27', 'transfermovil', 'NX-20260208-671DB6', 'procesando_verificacion', NULL, NULL, NULL, NULL, NULL),
+(319, 'ORD-20260208-6987FCD49FD40', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, 'Transferencia registrada: MM603RT559967 | Monto: $2160 | Fecha: 2026-02-07 | Banco: Banco Metropolitano | Stock actualizado para 1 productos', '2026-02-08 03:02:44', '2026-02-08 03:03:22', 'transfermovil', 'NX-20260208-12759E', 'procesando_verificacion', NULL, NULL, NULL, NULL, NULL),
+(320, 'ORD-20260212-698D69EC5BF65', 2, 5, NULL, 'pendiente', '900.00', '90.00', '1350.00', '10.00', '2160.00', NULL, NULL, NULL, NULL, NULL, '2026-02-12 05:49:32', '2026-02-12 05:49:32', 'efectivo', NULL, 'pendiente', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1484,7 +1701,13 @@ INSERT INTO `orden_detalle` (`id`, `id_orden`, `id_producto_tienda`, `cantidad`,
 (5, 4, 4, 1, '63000.00', '7875.00', '55125.00', '2025-12-14 09:47:07'),
 (6, 5, 23, 1, '292500.00', '20884.50', '271615.50', '2025-12-14 10:01:28'),
 (7, 6, 7, 1, '562500.00', '21656.25', '540843.75', '2025-12-14 10:47:06'),
-(8, 7, 6, 1, '495000.00', '41233.50', '453766.50', '2025-12-14 12:20:44');
+(8, 7, 6, 1, '495000.00', '41233.50', '453766.50', '2025-12-14 12:20:44'),
+(10, 285, 76, 1, '900.00', '90.00', '810.00', '2026-02-06 23:19:26'),
+(11, 286, 76, 1, '900.00', '90.00', '810.00', '2026-02-06 23:22:13'),
+(12, 317, 76, 1, '900.00', '90.00', '810.00', '2026-02-08 02:55:11'),
+(13, 318, 76, 7, '900.00', '90.00', '5670.00', '2026-02-08 02:57:26'),
+(14, 319, 76, 1, '900.00', '90.00', '810.00', '2026-02-08 03:03:22'),
+(15, 320, 76, 1, '900.00', '90.00', '810.00', '2026-02-12 05:49:33');
 
 -- --------------------------------------------------------
 
@@ -2235,7 +2458,7 @@ INSERT INTO `producto_tienda` (`id`, `id_producto`, `id_tienda`, `precio`, `prec
 (73, 62, 1, '9000.00', '10000.00', '10.00', 55, 18, 'TS-MAYBELLSKY', 0, 2, '1350.00', 0, 0, '4.65', 39, 68, 130, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
 (74, 63, 1, '5400.00', '6000.00', '10.00', 60, 20, 'TS-NIVEACREMA', 0, 2, '1350.00', 0, 0, '4.60', 52, 88, 155, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
 (75, 64, 1, '4500.00', '5000.00', '10.00', 80, 25, 'TS-NESCAFECLAS', 0, 2, '1350.00', 0, 0, '4.80', 62, 105, 200, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
-(76, 65, 1, '900.00', '1000.00', '10.00', 100, 30, 'TS-COCACOLA2L', 0, 2, '1350.00', 0, 0, '4.90', 75, 128, 250, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
+(76, 65, 1, '900.00', '1000.00', '10.00', 88, 30, 'TS-COCACOLA2L', 0, 2, '1350.00', 0, 0, '4.90', 75, 131, 250, 'activo', '2025-12-23 15:07:44', '2026-02-12 05:49:33'),
 (77, 66, 1, '450.00', '500.00', '10.00', 120, 40, 'TS-KNORRSOPA', 0, 2, '1350.00', 0, 0, '4.40', 45, 78, 135, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
 (78, 67, 1, '900000.00', '1000000.00', '10.00', 5, 2, 'TS-LGREFRI', 36, 7, '9000.00', 0, 1, '4.95', 15, 22, 90, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
 (79, 68, 1, '630000.00', '700000.00', '10.00', 6, 2, 'TS-SAMLAVAD', 36, 7, '9000.00', 0, 1, '4.90', 18, 28, 105, 'activo', '2025-12-23 15:07:44', '2025-12-23 15:07:44'),
@@ -2702,7 +2925,7 @@ CREATE TABLE `tienda` (
 --
 
 INSERT INTO `tienda` (`id`, `nombre`, `descripcion`, `id_usuario_propietario`, `id_municipio`, `direccion`, `telefono`, `email`, `sitio_web`, `logo`, `banner`, `redes_sociales`, `politicas`, `calificacion_promedio`, `estado`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'TechStore Cuba', 'Tienda especializada en tecnología y electrónica', 2, 42, 'Calle 23 #456 entre L y M', '+5371234567', 'ventas@techstore.cu', 'https://techstore.cu', 'techstore_logo.png', 'techstore_banner.jpg', '{\"facebook\": \"techstorecuba\", \"instagram\": \"techstore_cu\", \"twitter\": \"techstorecu\"}', '{\"devoluciones\": \"30 días\", \"garantia\": \"1 año\", \"envios\": \"Gratis en compras > $50\"}', '4.70', 'activa', '2025-11-17 02:15:55', '2026-01-24 20:26:25');
+(1, 'TechStore Cuba', 'Tienda especializada en tecnología y electrónica', 2, 42, 'Calle 23 #456 entre L y M', '+5371234567', 'ventas@techstore.cu', 'https://techstore.cu', 'techstore_logo.png', 'techstore_banner.jpg', '{\"facebook\": \"techstorecuba\", \"instagram\": \"techstore_cu\", \"twitter\": \"techstorecu\"}', '{\"devoluciones\": \"30 días\", \"garantia\": \"1 año\", \"envios\": \"Gratis en compras > $50\"}', '4.70', 'activa', '2025-11-17 02:15:55', '2026-02-12 05:49:33');
 
 -- --------------------------------------------------------
 
@@ -2802,6 +3025,83 @@ CREATE TABLE `transferencia_pagos` (
   `fecha_registro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `transferencia_pagos`
+--
+
+INSERT INTO `transferencia_pagos` (`id`, `id_orden`, `id_usuario`, `banco`, `fecha_transferencia`, `numero_transaccion`, `monto`, `saldo_restante`, `numero_tarjeta_beneficiario`, `estado`, `fecha_registro`) VALUES
+(8, 197, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559987', '112500.00', NULL, '', 'pendiente', '2026-02-02 11:11:48'),
+(9, 200, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559988', '112500.00', NULL, '', 'pendiente', '2026-02-02 11:29:33'),
+(10, 201, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559989', '112500.00', NULL, '', 'pendiente', '2026-02-02 11:40:08'),
+(11, 202, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559990', '112500.00', NULL, '', 'pendiente', '2026-02-02 11:50:36'),
+(12, 204, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559991', '112500.00', NULL, '', 'pendiente', '2026-02-02 11:54:24'),
+(13, 206, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559992', '112500.00', NULL, '', 'pendiente', '2026-02-02 11:57:49'),
+(14, 208, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559993', '112500.00', NULL, '', 'pendiente', '2026-02-02 12:09:52'),
+(15, 209, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559994', '112500.00', NULL, '', 'pendiente', '2026-02-02 12:12:26'),
+(16, 210, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559995', '112500.00', NULL, '', 'pendiente', '2026-02-02 12:44:35'),
+(17, 211, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559996', '112500.00', NULL, '', 'pendiente', '2026-02-02 12:48:45'),
+(18, 212, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559997', '112500.00', NULL, '', 'pendiente', '2026-02-02 12:59:23'),
+(19, 213, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559998', '112500.00', NULL, '', 'pendiente', '2026-02-02 13:17:28'),
+(20, 214, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559999', '112500.00', NULL, '', 'pendiente', '2026-02-02 13:25:31'),
+(21, 215, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559909', '112500.00', NULL, '', 'pendiente', '2026-02-02 15:45:25'),
+(22, 216, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559900', '112500.00', NULL, '', 'pendiente', '2026-02-02 21:20:28'),
+(23, 217, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559901', '112500.00', NULL, '', 'pendiente', '2026-02-02 21:23:37'),
+(24, 218, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559902', '112500.00', NULL, '', 'pendiente', '2026-02-02 21:39:07'),
+(25, 220, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559903', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:06:53'),
+(26, 222, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559904', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:08:33'),
+(27, 223, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559905', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:09:41'),
+(28, 224, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559906', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:11:06'),
+(29, 225, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559907', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:13:47'),
+(30, 226, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559911', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:15:37'),
+(31, 227, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559912', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:25:23'),
+(32, 228, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559913', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:28:59'),
+(33, 229, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559914', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:30:38'),
+(34, 230, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559915', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:36:30'),
+(35, 231, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559916', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:40:54'),
+(36, 232, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559917', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:42:40'),
+(37, 233, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559918', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:44:12'),
+(38, 234, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559919', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:46:56'),
+(39, 235, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559920', '112500.00', NULL, '', 'pendiente', '2026-02-02 22:53:39'),
+(40, 236, 2, 'Banco Metropolitano', '2026-02-02', 'MM603RT559922', '112500.00', NULL, '', 'pendiente', '2026-02-02 23:31:53'),
+(41, 237, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559923', '112500.00', NULL, '', 'pendiente', '2026-02-04 20:09:35'),
+(42, 238, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559924', '112500.00', NULL, '', 'pendiente', '2026-02-04 20:14:55'),
+(43, 239, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559925', '112500.00', NULL, '', 'pendiente', '2026-02-04 20:27:44'),
+(44, 240, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559926', '2160.00', NULL, '', 'pendiente', '2026-02-04 20:33:20'),
+(45, 241, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559927', '2160.00', NULL, '', 'pendiente', '2026-02-04 20:34:59'),
+(46, 242, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559928', '2160.00', NULL, '', 'pendiente', '2026-02-04 20:38:16'),
+(47, 243, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559929', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:07:03'),
+(48, 244, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559930', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:15:59'),
+(49, 245, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559931', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:23:11'),
+(50, 246, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559932', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:32:43'),
+(51, 247, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559933', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:34:23'),
+(52, 248, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559934', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:37:25'),
+(53, 249, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559935', '2160.00', NULL, '', 'pendiente', '2026-02-04 21:42:31'),
+(54, 251, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559936', '4320.00', NULL, '', 'pendiente', '2026-02-04 21:47:08'),
+(55, 252, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559937', '4320.00', NULL, '', 'pendiente', '2026-02-04 21:53:59'),
+(56, 253, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559938', '4320.00', NULL, '', 'pendiente', '2026-02-04 21:56:41'),
+(57, 254, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559939', '4320.00', NULL, '', 'pendiente', '2026-02-04 21:58:20'),
+(58, 255, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559940', '4320.00', NULL, '', 'pendiente', '2026-02-04 21:59:57'),
+(59, 256, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559941', '4320.00', NULL, '', 'pendiente', '2026-02-04 22:01:26'),
+(60, 257, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559942', '4320.00', NULL, '', 'pendiente', '2026-02-04 22:03:01'),
+(61, 259, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559943', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:15:34'),
+(62, 260, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559944', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:18:44'),
+(63, 261, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559945', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:20:51'),
+(64, 262, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559946', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:27:54'),
+(65, 263, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559947', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:37:27'),
+(66, 264, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559948', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:45:34'),
+(67, 265, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559949', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:47:40'),
+(68, 266, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559950', '2160.00', NULL, '', 'pendiente', '2026-02-04 22:49:13'),
+(69, 267, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559951', '2160.00', NULL, '', 'pendiente', '2026-02-04 23:30:17'),
+(72, 271, 2, 'Banco Metropolitano', '2026-02-04', 'MM603RT559954', '2160.00', NULL, '', 'pendiente', '2026-02-04 23:43:34'),
+(73, 272, 2, 'Banco Metropolitano', '2026-02-05', 'MM603RT559955', '48560.00', NULL, '', 'pendiente', '2026-02-05 00:14:25'),
+(74, 273, 2, 'Banco Metropolitano', '2026-02-05', 'MM603RT559956', '2160.00', NULL, '', 'pendiente', '2026-02-05 00:17:16'),
+(81, 302, 2, 'Banco Metropolitano', '2026-02-07', 'MM603RT559960', '2160.00', NULL, '', 'pendiente', '2026-02-07 17:35:31'),
+(82, 310, 2, 'Banco Metropolitano', '2026-02-07', 'MM603RT559961', '2160.00', NULL, '', 'pendiente', '2026-02-07 19:28:21'),
+(83, 315, 2, 'Banco Metropolitano', '2026-02-07', 'MM603RT559964', '2160.00', NULL, '', 'pendiente', '2026-02-07 21:03:15'),
+(84, 317, 2, 'Banco Metropolitano', '2026-02-07', 'MM603RT559965', '2160.00', NULL, '', 'pendiente', '2026-02-07 21:55:13'),
+(85, 318, 2, 'Banco Metropolitano', '2026-02-07', 'MM603RT559966', '15120.00', NULL, '', 'pendiente', '2026-02-07 21:57:26'),
+(86, 319, 2, 'Banco Metropolitano', '2026-02-07', 'MM603RT559967', '2160.00', NULL, '', 'pendiente', '2026-02-07 22:03:22');
+
 -- --------------------------------------------------------
 
 --
@@ -2871,7 +3171,7 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`id`, `username`, `email`, `password_hash`, `nombres`, `apellidos`, `dni`, `telefono`, `fecha_nacimiento`, `genero`, `avatar`, `id_tipo_usuario`, `email_verificado`, `token_verificacion`, `token_recuperacion`, `fecha_expiracion_token`, `intentos_recuperacion`, `fecha_ultimo_intento`, `ultimo_login`, `estado`, `fecha_creacion`, `fecha_actualizacion`, `last_seen`, `chat_status`) VALUES
 (1, 'vendedor', 'vendedor@gmail.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'Vendedor 1', '', NULL, NULL, NULL, NULL, 'default_avatar.png', 3, 1, NULL, NULL, NULL, 0, NULL, '2026-01-17 02:10:56', 'pendiente_verificacion', '2026-01-04 06:25:09', '2026-01-17 07:10:56', '2026-01-17 07:10:56', 'offline'),
-(2, 'cliente', 'noeldavidchaconsanchez@gmail.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'Juan', 'Torres', '12345678901', '12345678', '1998-12-21', 'Masculino', '6930d66d1f92f-884b9aac9ac8b5e3124457c2edf16eb6.jpg', 2, 1, NULL, 'b843ecac35de15c8dd4f45b0b5c12e2386d9eafcbe48c1fa08b125967b4d388c', '2026-01-03 02:02:09', 2, '2026-01-03 01:02:09', '2026-02-01 01:00:58', 'activo', '2025-11-15 06:04:48', '2026-02-01 06:00:58', '2026-02-01 06:00:58', 'offline');
+(2, 'cliente', 'noeldavidchaconsanchez@gmail.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'Juan', 'Torres', '12345678901', '12345678', '1998-12-21', 'Masculino', '6930d66d1f92f-884b9aac9ac8b5e3124457c2edf16eb6.jpg', 2, 1, NULL, 'b843ecac35de15c8dd4f45b0b5c12e2386d9eafcbe48c1fa08b125967b4d388c', '2026-01-03 02:02:09', 2, '2026-01-03 01:02:09', '2026-02-12 00:48:21', 'activo', '2025-11-15 06:04:48', '2026-02-12 05:48:21', '2026-02-12 05:48:21', 'offline');
 
 -- --------------------------------------------------------
 
@@ -2936,7 +3236,7 @@ CREATE TABLE `usuario_direccion` (
 INSERT INTO `usuario_direccion` (`id`, `id_usuario`, `alias`, `direccion`, `id_municipio`, `codigo_postal`, `telefono_contacto`, `instrucciones_entrega`, `es_principal`, `estado`, `fecha_creacion`, `fecha_actualizacion`) VALUES
 (1, 2, 'cliente', 'Neptuno #616B /Gervacio y Escobar', 36, '10400', '12345678', NULL, 0, 'inactiva', '2025-11-17 02:25:20', '2025-12-17 18:25:24'),
 (3, 2, 'Dirección 2025-12-17 06:38:11', 'Lois', 36, NULL, NULL, NULL, 1, 'inactiva', '2025-12-17 05:38:11', '2025-12-17 05:51:17'),
-(5, 2, 'Casa', 'Calle 26, Habana del Este, La Habana', 36, NULL, '12345678', '', 1, 'activa', '2025-12-17 18:25:11', '2026-02-01 06:29:25'),
+(5, 2, 'Casa', 'Calle 26, Habana del Este, La Habana', 36, NULL, '12345678', '', 1, 'activa', '2025-12-17 18:25:11', '2026-02-05 01:38:06'),
 (6, 2, 'Trabajo', 'Calle 26', 41, NULL, NULL, '', 0, 'activa', '2025-12-18 04:21:14', '2025-12-18 04:21:14');
 
 -- --------------------------------------------------------
@@ -3073,13 +3373,13 @@ CREATE TABLE `vista_productos_oferta_actual` (
 ,`id_producto` int(11)
 ,`id_tienda` int(11)
 ,`precio` decimal(12,2)
-,`descuento_porcentaje` decimal(19,2)
+,`descuento_porcentaje` decimal(5,2)
 ,`precio_final` decimal(12,2)
-,`envio_gratis` tinyint(4)
+,`envio_gratis` tinyint(1)
 ,`stock` int(11)
-,`estado` varchar(10)
+,`estado` enum('activo','inactivo','agotado','pausado')
 ,`tipo_oferta` varchar(17)
-,`fecha_fin_oferta` datetime
+,`fecha_fin_oferta` binary(0)
 );
 
 -- --------------------------------------------------------
@@ -3212,6 +3512,16 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `banners`
+--
+ALTER TABLE `banners`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_posicion_estado` (`posicion`,`estado`),
+  ADD KEY `idx_fechas` (`fecha_inicio`,`fecha_fin`),
+  ADD KEY `idx_orden` (`orden`),
+  ADD KEY `id_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `bundle`
@@ -3668,6 +3978,12 @@ ALTER TABLE `wishlist_producto`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `banners`
+--
+ALTER TABLE `banners`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `bundle`
 --
 ALTER TABLE `bundle`
@@ -3683,7 +3999,7 @@ ALTER TABLE `bundle_producto`
 -- AUTO_INCREMENT de la tabla `carrito`
 --
 ALTER TABLE `carrito`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT de la tabla `categoria`
@@ -3761,7 +4077,7 @@ ALTER TABLE `favorito`
 -- AUTO_INCREMENT de la tabla `historial`
 --
 ALTER TABLE `historial`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_movimiento`
@@ -3773,7 +4089,7 @@ ALTER TABLE `inventario_movimiento`
 -- AUTO_INCREMENT de la tabla `logs_pagos`
 --
 ALTER TABLE `logs_pagos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `marca`
@@ -3791,7 +4107,7 @@ ALTER TABLE `metodo_pago`
 -- AUTO_INCREMENT de la tabla `modulo`
 --
 ALTER TABLE `modulo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `moneda`
@@ -3821,13 +4137,13 @@ ALTER TABLE `oferta_flash`
 -- AUTO_INCREMENT de la tabla `orden`
 --
 ALTER TABLE `orden`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=321;
 
 --
 -- AUTO_INCREMENT de la tabla `orden_detalle`
 --
 ALTER TABLE `orden_detalle`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -3905,7 +4221,7 @@ ALTER TABLE `transaccion_pago`
 -- AUTO_INCREMENT de la tabla `transferencia_pagos`
 --
 ALTER TABLE `transferencia_pagos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT de la tabla `unidad_medida`
@@ -3970,6 +4286,12 @@ ALTER TABLE `wishlist_producto`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `banners`
+--
+ALTER TABLE `banners`
+  ADD CONSTRAINT `banners_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`);
 
 --
 -- Filtros para la tabla `bundle`
