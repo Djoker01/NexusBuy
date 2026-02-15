@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-02-2026 a las 00:22:04
+-- Tiempo de generación: 15-02-2026 a las 09:21:43
 -- Versión del servidor: 10.4.17-MariaDB
 -- Versión de PHP: 7.4.15
 
@@ -218,9 +218,9 @@ CREATE TABLE `banners` (
 --
 
 INSERT INTO `banners` (`id`, `titulo`, `descripcion`, `imagen`, `url`, `posicion`, `orden`, `fecha_inicio`, `fecha_fin`, `estado`, `texto_boton`, `icono_boton`, `id_usuario`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'Ofertas de Verano', 'Hasta 50% de descuento en productos seleccionados. Aprovecha estas ofertas por tiempo limitado.', 'Banner 1.jpg', 'Views/ofertas.php', 'slider_principal', 1, '2026-02-12', '2026-03-14', 0, 'Ver Ofertas', 'fa-tag', 1, '2026-02-12 01:57:31', '2026-02-12 02:20:33'),
-(2, 'Envío Gratis', 'En todas tus compras. Disfruta de envío rápido y seguro a todo el país.', 'Banner 2.jpg', 'Views/producto.php', 'slider_principal', 2, '2026-02-12', '2026-03-14', 1, 'Comprar Ahora', 'fa-truck', 1, '2026-02-12 01:57:31', '2026-02-12 01:59:59'),
-(3, 'Nuevos Productos', 'Descubre nuestra última colección de productos exclusivos. Tecnología innovadora al mejor precio.', 'Banner 3.jpg', 'Views/producto.php?filtro=nuevos', 'slider_principal', 3, '2026-02-12', '2026-03-14', 1, 'Explorar', 'fa-star', 1, '2026-02-12 01:57:31', '2026-02-12 02:13:25');
+(1, 'Ofertas de Verano', 'Hasta 50% de descuento en productos seleccionados. Aprovecha estas ofertas por tiempo limitado.', 'Banner 1.jpg', 'Views/ofertas.php', 'slider_principal', 1, '2026-02-12', '2026-03-14', 1, 'Ver Ofertas', 'fa-tag', 1, '2026-02-12 01:57:31', '2026-02-13 21:03:27'),
+(2, 'Envío Gratis', 'En todas tus compras. Disfruta de envío rápido y seguro a todo el país.', 'Banner 2.jpg', 'Views/producto.php', 'slider_principal', 2, '2026-02-12', '2026-03-14', 1, 'Comprar Ahora', 'fa-truck', 1, '2026-02-12 01:57:31', '2026-02-13 21:03:34'),
+(3, 'Nuevos Productos', 'Descubre nuestra última colección de productos exclusivos. Tecnología innovadora al mejor precio.', 'Banner 3.jpg', 'Views/producto.php?filtro=nuevos', 'slider_principal', 3, '2026-02-12', '2026-03-14', 1, 'Explorar', 'fa-star', 1, '2026-02-12 01:57:31', '2026-02-13 21:03:43');
 
 -- --------------------------------------------------------
 
@@ -549,6 +549,25 @@ CREATE TABLE `chat_notificaciones` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `comision`
+--
+
+CREATE TABLE `comision` (
+  `id` int(11) NOT NULL,
+  `id_venta` int(11) NOT NULL,
+  `id_tienda` int(11) NOT NULL,
+  `monto_base` decimal(10,2) NOT NULL,
+  `porcentaje` decimal(5,2) NOT NULL DEFAULT 10.00,
+  `valor_comision` decimal(10,2) NOT NULL,
+  `servicios_descontados` decimal(10,2) DEFAULT 0.00 COMMENT 'Publicidad, banners, etc',
+  `monto_final_vendedor` decimal(10,2) NOT NULL,
+  `fecha_calculo` datetime NOT NULL,
+  `estado` enum('pendiente','aplicada','revertida') DEFAULT 'pendiente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `configuracion_sitio`
 --
 
@@ -694,6 +713,53 @@ CREATE TABLE `cupon_usado` (
   `descuento_aplicado` decimal(10,2) NOT NULL,
   `fecha_uso` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `devolucion`
+--
+
+CREATE TABLE `devolucion` (
+  `id` int(11) NOT NULL,
+  `id_venta` int(11) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `monto_devuelto` decimal(10,2) NOT NULL,
+  `motivo` text NOT NULL,
+  `metodo_reembolso` enum('original','saldo','transferencia') DEFAULT 'original',
+  `estado` enum('solicitada','aprobada','rechazada','completada') DEFAULT 'solicitada',
+  `fecha_solicitud` datetime NOT NULL,
+  `fecha_aprobacion` datetime DEFAULT NULL,
+  `fecha_reembolso` datetime DEFAULT NULL,
+  `id_admin_aprueba` int(11) DEFAULT NULL,
+  `notas` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `disputa`
+--
+
+CREATE TABLE `disputa` (
+  `id` int(11) NOT NULL,
+  `id_venta` int(11) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `id_vendedor` int(11) NOT NULL,
+  `tipo` enum('devolucion','reclamo','producto_no_recibido','producto_defectuoso','otro') NOT NULL,
+  `motivo` text NOT NULL,
+  `monto_reclamado` decimal(10,2) NOT NULL,
+  `estado` enum('abierta','en_revision','resuelta_favor_cliente','resuelta_favor_vendedor','cerrada') DEFAULT 'abierta',
+  `evidencia_cliente` text DEFAULT NULL,
+  `evidencia_vendedor` text DEFAULT NULL,
+  `decision_admin` text DEFAULT NULL,
+  `id_admin_resuelve` int(11) DEFAULT NULL,
+  `fecha_apertura` datetime NOT NULL,
+  `fecha_resolucion` datetime DEFAULT NULL,
+  `monto_reembolsado` decimal(10,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1110,6 +1176,26 @@ INSERT INTO `moneda` (`id`, `codigo`, `nombre`, `simbolo`, `tasa_cambio`, `estad
 (2, 'USD', 'Dólar Americano', 'USD$', '450.0000', 'activa', '2025-12-14 02:13:30'),
 (3, 'EUR', 'Euro', '€', '540.0000', 'activa', '2025-11-15 16:14:20'),
 (4, 'RUB', 'Rublio', 'Ꝑ', '120.0000', 'activa', '2025-12-03 04:36:28');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `movimiento`
+--
+
+CREATE TABLE `movimiento` (
+  `id` int(11) NOT NULL,
+  `id_tienda` int(11) NOT NULL,
+  `tipo` enum('venta','comision','servicio','retiro','devolucion','ajuste') NOT NULL,
+  `concepto` varchar(255) NOT NULL,
+  `monto` decimal(10,2) NOT NULL,
+  `saldo_anterior` decimal(10,2) NOT NULL,
+  `saldo_nuevo` decimal(10,2) NOT NULL,
+  `referencia_id` int(11) DEFAULT NULL COMMENT 'ID de venta, servicio, etc',
+  `referencia_tabla` varchar(50) DEFAULT NULL,
+  `fecha` datetime NOT NULL,
+  `estado` enum('pendiente','completado','cancelado') DEFAULT 'completado'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -2594,6 +2680,44 @@ INSERT INTO `reseña` (`id`, `id_usuario`, `id_producto_tienda`, `id_orden_detal
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `retencion`
+--
+
+CREATE TABLE `retencion` (
+  `id` int(11) NOT NULL,
+  `id_venta` int(11) NOT NULL,
+  `id_tienda` int(11) NOT NULL,
+  `monto_retenido` decimal(10,2) NOT NULL,
+  `fecha_retencion` datetime NOT NULL,
+  `fecha_liberacion` datetime NOT NULL COMMENT 'fecha_retencion + 7 días',
+  `liberada` tinyint(1) DEFAULT 0,
+  `fecha_liberacion_real` datetime DEFAULT NULL,
+  `notas` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `saldo_vendedor`
+--
+
+CREATE TABLE `saldo_vendedor` (
+  `id` int(11) NOT NULL,
+  `id_tienda` int(11) NOT NULL,
+  `id_vendedor` int(11) NOT NULL,
+  `saldo_actual` decimal(10,2) DEFAULT 0.00,
+  `saldo_retenido` decimal(10,2) DEFAULT 0.00,
+  `saldo_disponible` decimal(10,2) DEFAULT 0.00,
+  `total_ganado` decimal(10,2) DEFAULT 0.00,
+  `total_retirado` decimal(10,2) DEFAULT 0.00,
+  `total_comisiones` decimal(10,2) DEFAULT 0.00,
+  `total_servicios` decimal(10,2) DEFAULT 0.00,
+  `fecha_actualizacion` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `subcategoria`
 --
 
@@ -3171,7 +3295,8 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`id`, `username`, `email`, `password_hash`, `nombres`, `apellidos`, `dni`, `telefono`, `fecha_nacimiento`, `genero`, `avatar`, `id_tipo_usuario`, `email_verificado`, `token_verificacion`, `token_recuperacion`, `fecha_expiracion_token`, `intentos_recuperacion`, `fecha_ultimo_intento`, `ultimo_login`, `estado`, `fecha_creacion`, `fecha_actualizacion`, `last_seen`, `chat_status`) VALUES
 (1, 'vendedor', 'vendedor@gmail.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'Vendedor 1', '', NULL, NULL, NULL, NULL, 'default_avatar.png', 3, 1, NULL, NULL, NULL, 0, NULL, '2026-01-17 02:10:56', 'pendiente_verificacion', '2026-01-04 06:25:09', '2026-01-17 07:10:56', '2026-01-17 07:10:56', 'offline'),
-(2, 'cliente', 'noeldavidchaconsanchez@gmail.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'Juan', 'Torres', '12345678901', '12345678', '1998-12-21', 'Masculino', '6930d66d1f92f-884b9aac9ac8b5e3124457c2edf16eb6.jpg', 2, 1, NULL, 'b843ecac35de15c8dd4f45b0b5c12e2386d9eafcbe48c1fa08b125967b4d388c', '2026-01-03 02:02:09', 2, '2026-01-03 01:02:09', '2026-02-12 00:48:21', 'activo', '2025-11-15 06:04:48', '2026-02-12 05:48:21', '2026-02-12 05:48:21', 'offline');
+(2, 'cliente', 'noeldavidchaconsanchez@gmail.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'Juan', 'Torres', '12345678901', '12345678', '1998-12-21', 'Masculino', '6930d66d1f92f-884b9aac9ac8b5e3124457c2edf16eb6.jpg', 2, 1, NULL, 'b843ecac35de15c8dd4f45b0b5c12e2386d9eafcbe48c1fa08b125967b4d388c', '2026-01-03 02:02:09', 2, '2026-01-03 01:02:09', '2026-02-12 00:48:21', 'activo', '2025-11-15 06:04:48', '2026-02-12 05:48:21', '2026-02-12 05:48:21', 'offline'),
+(13, 'admin', 'admin@nexusbuy.com', '$2y$10$XdkxQ47IR7nHAWYTjipuz.LCzAiUqEKoTd/QxKA44tIoHsmjzoj5K', 'SuperAdmin', '', NULL, NULL, NULL, NULL, 'default_avatar.png', 1, 0, NULL, NULL, NULL, 0, NULL, '2026-02-15 00:34:30', 'activo', '2026-02-15 05:33:45', '2026-02-15 05:34:30', '2026-02-15 05:34:30', 'offline');
 
 -- --------------------------------------------------------
 
@@ -3319,6 +3444,26 @@ CREATE TABLE `usuario_privacidad` (
   `ultima_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `version_politica` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `venta`
+--
+
+CREATE TABLE `venta` (
+  `id` int(11) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `id_tienda` int(11) NOT NULL,
+  `id_producto_tienda` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  `descuento_aplicado` decimal(10,2) DEFAULT 0.00,
+  `total_vendedor` decimal(10,2) NOT NULL COMMENT 'Monto antes de comisiones',
+  `fecha_venta` datetime NOT NULL,
+  `estado` enum('completada','retenida','liberada','disputa','devuelta') DEFAULT 'retenida'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -3616,6 +3761,14 @@ ALTER TABLE `chat_notificaciones`
   ADD KEY `idx_fecha_creacion` (`fecha_creacion`);
 
 --
+-- Indices de la tabla `comision`
+--
+ALTER TABLE `comision`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_venta` (`id_venta`),
+  ADD KEY `id_tienda` (`id_tienda`);
+
+--
 -- Indices de la tabla `configuracion_sitio`
 --
 ALTER TABLE `configuracion_sitio`
@@ -3659,6 +3812,27 @@ ALTER TABLE `cupon_usado`
   ADD UNIQUE KEY `unique_cupon_orden` (`id_cupon`,`id_orden`),
   ADD KEY `id_usuario` (`id_usuario`),
   ADD KEY `id_orden` (`id_orden`);
+
+--
+-- Indices de la tabla `devolucion`
+--
+ALTER TABLE `devolucion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_venta` (`id_venta`),
+  ADD KEY `id_orden` (`id_orden`),
+  ADD KEY `id_cliente` (`id_cliente`),
+  ADD KEY `id_admin_aprueba` (`id_admin_aprueba`);
+
+--
+-- Indices de la tabla `disputa`
+--
+ALTER TABLE `disputa`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_venta` (`id_venta`),
+  ADD KEY `id_orden` (`id_orden`),
+  ADD KEY `id_cliente` (`id_cliente`),
+  ADD KEY `id_vendedor` (`id_vendedor`),
+  ADD KEY `id_admin_resuelve` (`id_admin_resuelve`);
 
 --
 -- Indices de la tabla `favorito`
@@ -3724,6 +3898,14 @@ ALTER TABLE `modulo`
 ALTER TABLE `moneda`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
+-- Indices de la tabla `movimiento`
+--
+ALTER TABLE `movimiento`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_tienda` (`id_tienda`),
+  ADD KEY `fecha` (`fecha`);
 
 --
 -- Indices de la tabla `municipio`
@@ -3831,6 +4013,23 @@ ALTER TABLE `reseña`
   ADD KEY `id_orden_detalle` (`id_orden_detalle`),
   ADD KEY `idx_producto_calificacion` (`id_producto_tienda`,`calificacion`),
   ADD KEY `idx_resena_fecha` (`fecha_creacion`,`estado`);
+
+--
+-- Indices de la tabla `retencion`
+--
+ALTER TABLE `retencion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_venta` (`id_venta`),
+  ADD KEY `id_tienda` (`id_tienda`),
+  ADD KEY `fecha_liberacion` (`fecha_liberacion`);
+
+--
+-- Indices de la tabla `saldo_vendedor`
+--
+ALTER TABLE `saldo_vendedor`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_tienda` (`id_tienda`),
+  ADD KEY `id_vendedor` (`id_vendedor`);
 
 --
 -- Indices de la tabla `subcategoria`
@@ -3959,6 +4158,15 @@ ALTER TABLE `usuario_privacidad`
   ADD KEY `idx_verificacion` (`verificacion_dos_pasos`);
 
 --
+-- Indices de la tabla `venta`
+--
+ALTER TABLE `venta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_orden` (`id_orden`),
+  ADD KEY `id_tienda` (`id_tienda`),
+  ADD KEY `id_producto_tienda` (`id_producto_tienda`);
+
+--
 -- Indices de la tabla `wishlist`
 --
 ALTER TABLE `wishlist`
@@ -4038,6 +4246,12 @@ ALTER TABLE `chat_notificaciones`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `comision`
+--
+ALTER TABLE `comision`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `configuracion_sitio`
 --
 ALTER TABLE `configuracion_sitio`
@@ -4065,6 +4279,18 @@ ALTER TABLE `cupon_producto`
 -- AUTO_INCREMENT de la tabla `cupon_usado`
 --
 ALTER TABLE `cupon_usado`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `devolucion`
+--
+ALTER TABLE `devolucion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `disputa`
+--
+ALTER TABLE `disputa`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -4114,6 +4340,12 @@ ALTER TABLE `modulo`
 --
 ALTER TABLE `moneda`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `movimiento`
+--
+ALTER TABLE `movimiento`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `municipio`
@@ -4182,6 +4414,18 @@ ALTER TABLE `reseña`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT de la tabla `retencion`
+--
+ALTER TABLE `retencion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `saldo_vendedor`
+--
+ALTER TABLE `saldo_vendedor`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `subcategoria`
 --
 ALTER TABLE `subcategoria`
@@ -4233,7 +4477,7 @@ ALTER TABLE `unidad_medida`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario_configuracion`
@@ -4269,6 +4513,12 @@ ALTER TABLE `usuario_notificaciones`
 -- AUTO_INCREMENT de la tabla `usuario_privacidad`
 --
 ALTER TABLE `usuario_privacidad`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `venta`
+--
+ALTER TABLE `venta`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -4326,6 +4576,13 @@ ALTER TABLE `chat_notificaciones`
   ADD CONSTRAINT `chat_notificaciones_ibfk_1` FOREIGN KEY (`conversacion_id`) REFERENCES `chat_conversaciones` (`id`) ON DELETE SET NULL;
 
 --
+-- Filtros para la tabla `comision`
+--
+ALTER TABLE `comision`
+  ADD CONSTRAINT `comision_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `venta` (`id`),
+  ADD CONSTRAINT `comision_ibfk_2` FOREIGN KEY (`id_tienda`) REFERENCES `tienda` (`id`);
+
+--
 -- Filtros para la tabla `cupon_producto`
 --
 ALTER TABLE `cupon_producto`
@@ -4339,6 +4596,25 @@ ALTER TABLE `cupon_usado`
   ADD CONSTRAINT `cupon_usado_ibfk_1` FOREIGN KEY (`id_cupon`) REFERENCES `cupon` (`id`),
   ADD CONSTRAINT `cupon_usado_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`),
   ADD CONSTRAINT `cupon_usado_ibfk_3` FOREIGN KEY (`id_orden`) REFERENCES `orden` (`id`);
+
+--
+-- Filtros para la tabla `devolucion`
+--
+ALTER TABLE `devolucion`
+  ADD CONSTRAINT `devolucion_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `venta` (`id`),
+  ADD CONSTRAINT `devolucion_ibfk_2` FOREIGN KEY (`id_orden`) REFERENCES `orden` (`id`),
+  ADD CONSTRAINT `devolucion_ibfk_3` FOREIGN KEY (`id_cliente`) REFERENCES `usuario` (`id`),
+  ADD CONSTRAINT `devolucion_ibfk_4` FOREIGN KEY (`id_admin_aprueba`) REFERENCES `usuario` (`id`);
+
+--
+-- Filtros para la tabla `disputa`
+--
+ALTER TABLE `disputa`
+  ADD CONSTRAINT `disputa_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `venta` (`id`),
+  ADD CONSTRAINT `disputa_ibfk_2` FOREIGN KEY (`id_orden`) REFERENCES `orden` (`id`),
+  ADD CONSTRAINT `disputa_ibfk_3` FOREIGN KEY (`id_cliente`) REFERENCES `usuario` (`id`),
+  ADD CONSTRAINT `disputa_ibfk_4` FOREIGN KEY (`id_vendedor`) REFERENCES `usuario` (`id`),
+  ADD CONSTRAINT `disputa_ibfk_5` FOREIGN KEY (`id_admin_resuelve`) REFERENCES `usuario` (`id`);
 
 --
 -- Filtros para la tabla `favorito`
@@ -4367,6 +4643,12 @@ ALTER TABLE `inventario_movimiento`
 --
 ALTER TABLE `logs_pagos`
   ADD CONSTRAINT `fk_logs_orden` FOREIGN KEY (`orden_id`) REFERENCES `orden` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `movimiento`
+--
+ALTER TABLE `movimiento`
+  ADD CONSTRAINT `movimiento_ibfk_1` FOREIGN KEY (`id_tienda`) REFERENCES `tienda` (`id`);
 
 --
 -- Filtros para la tabla `municipio`
@@ -4429,6 +4711,20 @@ ALTER TABLE `reseña`
   ADD CONSTRAINT `reseña_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `reseña_ibfk_2` FOREIGN KEY (`id_producto_tienda`) REFERENCES `producto_tienda` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `reseña_ibfk_3` FOREIGN KEY (`id_orden_detalle`) REFERENCES `orden_detalle` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `retencion`
+--
+ALTER TABLE `retencion`
+  ADD CONSTRAINT `retencion_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `venta` (`id`),
+  ADD CONSTRAINT `retencion_ibfk_2` FOREIGN KEY (`id_tienda`) REFERENCES `tienda` (`id`);
+
+--
+-- Filtros para la tabla `saldo_vendedor`
+--
+ALTER TABLE `saldo_vendedor`
+  ADD CONSTRAINT `saldo_vendedor_ibfk_1` FOREIGN KEY (`id_tienda`) REFERENCES `tienda` (`id`),
+  ADD CONSTRAINT `saldo_vendedor_ibfk_2` FOREIGN KEY (`id_vendedor`) REFERENCES `usuario` (`id`);
 
 --
 -- Filtros para la tabla `subcategoria`
@@ -4500,6 +4796,14 @@ ALTER TABLE `usuario_notificaciones`
 --
 ALTER TABLE `usuario_privacidad`
   ADD CONSTRAINT `fk_privacidad_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `venta`
+--
+ALTER TABLE `venta`
+  ADD CONSTRAINT `venta_ibfk_1` FOREIGN KEY (`id_orden`) REFERENCES `orden` (`id`),
+  ADD CONSTRAINT `venta_ibfk_2` FOREIGN KEY (`id_tienda`) REFERENCES `tienda` (`id`),
+  ADD CONSTRAINT `venta_ibfk_3` FOREIGN KEY (`id_producto_tienda`) REFERENCES `producto_tienda` (`id`);
 
 --
 -- Filtros para la tabla `wishlist`
