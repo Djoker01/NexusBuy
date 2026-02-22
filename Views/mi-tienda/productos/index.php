@@ -1192,5 +1192,8 @@ include_once '../layouts/header.php';
         //     });
         // });
     </script>
+<script src="../../../Util/Js/jquery.min.js"></script>
+    <script src="productos.js"></script>
 </body>
+
 </html>
