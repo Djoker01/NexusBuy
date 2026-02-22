@@ -20,18 +20,19 @@ $(document).ready(function () {
 
   function verificar_sesion() {
     funcion = "verificar_sesion";
-    $.post("../../../Controllers/UsuarioController.php", { funcion }, (response) => {
-      //console.log(response);
+    $.post("../../Controllers/UsuarioController.php", { funcion }, (response) => {
+      
       if (response != "") {
         let sesion = JSON.parse(response);
-        $("#nav_login").hide();
-        $("#nav_register").hide();
-        $("#usuario_nav").text(sesion.user);
-        $("#avatar_nav").attr("src", "../../../Util/Img/Users/" + sesion.avatar);
-        $("#avatar_menu").attr("src", "../../../Util/Img/Users/" + sesion.avatar);
-        $("#usuario_menu").text(sesion.user);
-        $("#favoritos").show();
-        $("#notification").show();
+        console.log(sesion);
+        // $("#nav_login").hide();
+        // $("#nav_register").hide();
+        $(".user-name").text(sesion.user);
+        $(".user-avatar").attr("src", "../../Util/Img/Users/" + sesion.avatar);
+        // $("#avatar_menu").attr("src", "../../../Util/Img/Users/" + sesion.avatar);
+        // $("#usuario_menu").text(sesion.user);
+        // $("#favoritos").show();
+        // $("#notification").show();
         // Actualizar notificaciones después de verificar sesión
         // actualizarNotificacionesHeader();
       } else {
