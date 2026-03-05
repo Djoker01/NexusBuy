@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{subject}}</title>
+    <style>
+        /* Reset y base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Contenedor principal */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 4px solid #f0c040;
+        }
+        
+        .logo {
+            max-width: 180px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-subtext {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        /* Contenido */
+        .email-content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+        
+        /* Botones */
+        .button-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #4cc9f0, #4895ef);
+        }
+        
+        /* Footer */
+        .email-footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .social-links {
+            margin-bottom: 20px;
+        }
+        
+        .social-icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #4361ee;
+            color: white;
+            border-radius: 50%;
+            line-height: 40px;
+            text-align: center;
+            margin: 0 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background: #3a0ca3;
+            transform: translateY(-3px);
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-links a {
+            color: #4361ee;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-header, .email-content {
+                padding: 25px 20px;
+            }
+            
+            .logo-text {
+                font-size: 24px;
+            }
+            
+            .btn {
+                padding: 14px 30px;
+                font-size: 15px;
+            }
+        }
+        
+        /* Tipografía */
+        h1, h2, h3, h4 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        /* Listas */
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        /* Alertas */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+            color: #0d47a1;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <div class="logo-text">NEXUSBUY</div>
+            <div class="logo-subtext">Las mejores ofertas en un solo lugar</div>
+        </div>
+        
+        <!-- Contenido dinámico -->
+        <div class="email-content">
+            {{content}}
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="social-links">
+                <a href="{{facebook_url}}" class="social-icon">FB</a>
+                <a href="{{instagram_url}}" class="social-icon">IG</a>
+                <a href="{{twitter_url}}" class="social-icon">TW</a>
+                <a href="{{youtube_url}}" class="social-icon">YT</a>
+            </div>
+            
+            <div class="footer-text">
+                © {{current_year}} NexusBuy. Todos los derechos reservados.<br>
+                Este es un email automático, por favor no respondas a este mensaje.
+            </div>
+            
+            <div class="footer-links">
+                <a href="{{privacy_url}}">Política de Privacidad</a> |
+                <a href="{{terms_url}}">Términos de Servicio</a> |
+                <a href="{{unsubscribe_url}}">Cancelar Suscripción</a> |
+                <a href="{{contact_url}}">Contacto</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

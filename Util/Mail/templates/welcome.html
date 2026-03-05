@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="greeting">¡Bienvenido/a a NexusBuy, {{user_name}}! 🎉</div>
+
+<div class="message">
+    <p>¡Tu suscripción ha sido confirmada exitosamente! Ahora eres parte de nuestra comunidad exclusiva.</p>
+    
+    <p>Recibirás nuestras mejores ofertas <strong>{{frequency_text}}</strong> directamente en tu bandeja de entrada.</p>
+</div>
+
+<div class="button-container">
+    <a href="{{offers_url}}" class="btn">Ver Ofertas Actuales</a>
+    <a href="{{profile_url}}" class="btn btn-secondary" style="margin-left: 15px;">Gestionar Suscripción</a>
+</div>
+
+<h3>✨ Beneficios de ser suscriptor:</h3>
+<div class="message">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0;">
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #4361ee;">
+            <h4 style="margin-top: 0;">🎯 Ofertas Personalizadas</h4>
+            <p>Recibe ofertas basadas en tus categorías favoritas.</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #4cc9f0;">
+            <h4 style="margin-top: 0;">⚡ Acceso Anticipado</h4>
+            <p>Sé el primero en conocer nuevas promociones.</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #f72585;">
+            <h4 style="margin-top: 0;">💰 Descuentos Exclusivos</h4>
+            <p>Cupones y promociones solo para suscriptores.</p>
+        </div>
+    </div>
+</div>
+
+<h3>📱 ¡Síguenos en redes sociales!</h3>
+<div class="message">
+    <p>Mantente al día con nuestras últimas novedades:</p>
+    <ul>
+        <li><strong>Facebook:</strong> Ofertas diarias y sorteos</li>
+        <li><strong>Instagram:</strong> Nuevos productos y unboxings</li>
+        <li><strong>Twitter:</strong> Alertas de ofertas flash</li>
+        <li><strong>YouTube:</strong> Reviews y comparativas</li>
+    </ul>
+</div>
+
+<div class="alert alert-success">
+    <p><strong>💡 Consejo:</strong> Agrega <strong>ofertas@nexusbuy.com</strong> a tus contactos para asegurarte de recibir todos nuestros emails.</p>
+</div>
+{% endblock %}
+
+{% block subject %}¡Bienvenido a NexusBuy!{% endblock %}

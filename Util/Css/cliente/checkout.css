@@ -1,0 +1,161 @@
+/* Pasos del checkout - diseño específico */
+    .checkout-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .checkout-steps::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #dee2e6;
+        z-index: 1;
+    }
+
+    .step {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #dee2e6;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-weight: bold;
+        border: 3px solid white;
+    }
+
+    .step.active .step-number {
+        background: var(--primary);
+        color: white;
+    }
+
+    .step.completed .step-number {
+        background: var(--success);
+        color: white;
+    }
+
+    .step-label {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .step.active .step-label {
+        color: var(--primary);
+    }
+
+    .step.completed .step-label {
+        color: var(--success);
+    }
+
+    /* Métodos de pago - diseño específico */
+    .payment-method {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .payment-method:hover {
+        border-color: var(--primary);
+    }
+
+    .payment-method.selected {
+        border-color: var(--primary);
+        background-color: #f8f9fa;
+    }
+
+    .payment-method input[type="radio"] {
+        margin-right: 10px;
+    }
+
+    /* Contenedores de resumen específicos */
+    .resumen-producto {
+        border-bottom: 1px solid #dee2e6;
+        padding: 10px 0;
+    }
+
+    .resumen-producto:last-child {
+        border-bottom: none;
+    }
+
+    /* Ajustes específicos para formularios de checkout */
+    .checkout-step {
+        animation: fadeIn 0.5s ease;
+    }
+
+    /* Estilos para el botón de procesar pago específico */
+    #btn-procesar-pago {
+        min-width: 200px;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+    }
+
+    #btn-procesar-pago.loading {
+        position: relative;
+        color: transparent;
+    }
+
+    #btn-procesar-pago.loading::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        border: 2px solid white;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* Responsive específico para checkout */
+    @media (max-width: 768px) {
+        .checkout-steps {
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .checkout-steps::before {
+            display: none;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .step-number {
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .checkout-step .card-body {
+            padding: 20px;
+        }
+
+        #btn-procesar-pago {
+            width: 100%;
+        }
+    }

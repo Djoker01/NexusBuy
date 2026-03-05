@@ -1,0 +1,132 @@
+/* Ajustes específicos para el layout de productos */
+    .products-main {
+        position: relative;
+    }
+
+    /* Estilo para el botón de volver específico */
+    .btn-outline-secondary.btn-sm i {
+        margin-right: 5px;
+    }
+
+    .btn-outline-danger.btn-sm i {
+        margin-right: 5px;
+    }
+
+    /* Estilo específico para el breadcrumb de productos */
+    .products-header nav.breadcrumb {
+        margin-top: 10px;
+    }
+
+    /* Ajuste específico para el contenedor de resultados */
+    #resultsCount {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    /* Estilo para el estado de carga inicial */
+    .products-grid .col-12.text-center {
+        grid-column: 1 / -1;
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 60px 20px;
+        box-shadow: var(--shadow);
+    }
+
+    /* Estilo específico para los badges de stock out */
+    .out-of-stock {
+        background: #ecd6d6ff;
+        color: #471111ff;
+    }
+
+    /* Estilo específico para los badges de vista rápida */
+    .quick-view-badge.badge-discount {
+        background: var(--danger);
+    }
+
+    .quick-view-badge.badge-new {
+        background: var(--accent);
+    }
+
+    /* Estilo específico para el botón de agregar al carrito */
+    .add-to-cart-btn.adding {
+        position: relative;
+        color: transparent;
+    }
+
+    .add-to-cart-btn.adding::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 2px solid white;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* Estilo para productos agotados */
+    .product-card.out-of-stock-card {
+        opacity: 0.8;
+        position: relative;
+    }
+
+    .product-card.out-of-stock-card::before {
+        content: 'AGOTADO';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        z-index: 3;
+        text-align: center;
+        width: 80%;
+    }
+
+    .product-card.out-of-stock-card .product-image img {
+        filter: grayscale(1);
+    }
+
+    /* Estilo para el texto del header derecho */
+    .products-header .text-md-right p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    /* Ajustes específicos para responsive */
+    @media (max-width: 768px) {
+        .products-header .text-md-right {
+            text-align: left !important;
+            margin-top: 15px;
+        }
+
+        .products-controls .gap-3 {
+            justify-content: center;
+        }
+
+        .products-controls .d-flex {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .pagination {
+            gap: 3px;
+        }
+
+        .page-link {
+            min-width: 40px;
+            min-height: 40px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .view-btn {
+            min-width: 40px;
+            min-height: 40px;
+        }
+    }

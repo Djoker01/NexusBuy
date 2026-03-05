@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="greeting">¡Hola {{user_name}}!</div>
+
+<div class="message">
+    <p>¡Gracias por suscribirte a las ofertas exclusivas de <strong>NexusBuy</strong>! Estamos emocionados de tenerte en nuestra comunidad.</p>
+    
+    <p>Para comenzar a recibir nuestras mejores ofertas, necesitamos que confirmes tu dirección de email.</p>
+</div>
+
+<div class="button-container">
+    <a href="{{confirmation_url}}" class="btn">Confirmar mi Email</a>
+</div>
+
+<div class="message">
+    <p>O copia y pega este enlace en tu navegador:</p>
+    <div class="alert alert-info">
+        <code style="word-break: break-all;">{{confirmation_url}}</code>
+    </div>
+    
+    <p><strong>¿Por qué confirmar tu email?</strong></p>
+    <ul>
+        <li>Asegurar que recibas todas nuestras ofertas</li>
+        <li>Prevenir suscripciones no deseadas</li>
+        <li>Acceder a ofertas exclusivas para suscriptores verificados</li>
+    </ul>
+    
+    <div class="alert alert-warning">
+        <p><strong>⚠️ Importante:</strong> Este enlace expirará en 24 horas.</p>
+        <p>Si no confirmas en ese tiempo, deberás suscribirte nuevamente.</p>
+    </div>
+    
+    <p>¿No te suscribiste a NexusBuy? Simplemente ignora este email y no se realizará ninguna acción.</p>
+</div>
+
+<h3>🎁 ¿Qué recibirás como suscriptor?</h3>
+<div class="message">
+    <ul>
+        <li><strong>Ofertas Flash:</strong> Descuentos por tiempo limitado</li>
+        <li><strong>Early Access:</strong> Acceso anticipado a promociones</li>
+        <li><strong>Descuentos Exclusivos:</strong> Solo para suscriptores</li>
+        <li><strong>Recomendaciones Personalizadas:</strong> Basadas en tus intereses</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block subject %}Confirma tu suscripción a NexusBuy{% endblock %}
