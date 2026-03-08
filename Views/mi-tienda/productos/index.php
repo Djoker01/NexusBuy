@@ -1,178 +1,97 @@
 <?php
 $base_path = "../";
+// Titulo de la página
 $pageTitle = "Gestión de Productos";
-$pageName = "Productos";
+// Titulo de la vista
+$pageName = "Mis Productos";
+// Descripción de la vista
 $pageDescription = "Gestiona tu catálogo de productos.";
+
+// Incluir Header
 include_once '../layouts/header.php';
+
+// Incluir modelos necesarios
+require_once '../../../Models/Producto.php';
+require_once '../../../Models/Categoria.php';
+require_once '../../../Models/Subcategoria.php';
+require_once '../../../Models/Tienda.php';
+require_once '../../../Models/Imagen.php';
+
+$tienda = new Tienda();
+$id_tienda = ($GLOBALS['tienda_actual']->id ?? 'SIN TIENDA');
+
+// $tienda->obtener_tienda_por_usuario($id_usuario);
+if (empty($id_tienda)) {
+    // Redirigir a crear tienda
+    header('Location: /mi-tienda/configuracion/');
+    exit;
+}
+// $id_tienda = $tienda->objetos[0]->id_tienda;
+
+// =============================================
+// FILTROS - Recibir y sanitizar parámetros GET
+// =============================================
+$buscar = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
+$categoria = isset($_GET['categoria']) ? (int)$_GET['categoria'] : 0;
+$subcategoria = isset($_GET['subcategoria']) ? (int)$_GET['subcategoria'] : 0;
+$estado = isset($_GET['estado']) ? $_GET['estado'] : '';
+$stock = isset($_GET['stock']) ? $_GET['stock'] : '';
+$destacado = isset($_GET['destacado']) ? (int)$_GET['destacado'] : 0;
+$fecha_desde = isset($_GET['fecha_desde']) ? $_GET['fecha_desde'] : '';
+$fecha_hasta = isset($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : '';
+$ordenar_por = isset($_GET['ordenar_por']) ? $_GET['ordenar_por'] : 'fecha_desc';
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$por_pagina = 10;
+$offset = ($pagina - 1) * $por_pagina;
+
+// =============================================
+// CONSTRUIR FILTROS PARA LA CONSULTA
+// =============================================
+$filtros = [
+    'id_tienda' => $id_tienda,
+    'buscar' => $buscar,
+    'categoria' => $categoria,
+    'subcategoria' => $subcategoria,
+    'estado' => $estado,
+    'stock' => $stock,
+    'destacado' => $destacado,
+    'fecha_desde' => $fecha_desde,
+    'fecha_hasta' => $fecha_hasta,
+    'ordenar_por' => $ordenar_por,
+    'limite' => $por_pagina,
+    'offset' => $offset
+];
+
+// =============================================
+// OBTENER DATOS CON FILTROS
+// =============================================
+$producto = new Producto();
+$productos = $producto->obtener_por_tienda_con_filtros($filtros);
+$total_productos = $producto->contar_por_tienda_con_filtros($filtros);
+$total_paginas = ceil($total_productos / $por_pagina);
+
+// Obtener categorías para los filtros
+$categoria_model = new Categoria();
+$categorias = $categoria_model->obtener_categorias_activas();
+
+// Obtener subcategorías si hay categoría seleccionada
+$subcategorias = [];
+if ($categoria > 0) {
+    $subcategoria_model = new Subcategoria();
+    $subcategorias = $subcategoria_model->obtener_subcategorias_por_categoria($categoria);
+}
+
+// Estadísticas para los contadores
+$stats = $producto->obtener_estadisticas_tienda($id_tienda);
+
+
 ?>
 
-
+<script>
+    console.log('DEBUG JS:', window.USUARIO_ACTUAL, window.TIENDA_ACTUAL);
+</script>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Inter', sans-serif;
-        background: #f8f9fa;
-        color: #212529;
-    }
-
-    /* Layout */
-    .app {
-        display: flex;
-        min-height: 100vh;
-    }
-
-    /* Sidebar (igual que dashboard) */
-    .sidebar {
-        width: 260px;
-        background: white;
-        border-right: 1px solid #e9ecef;
-        padding: 1.5rem;
-        position: fixed;
-        height: 100vh;
-        overflow-y: auto;
-    }
-
-    .logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #4361ee;
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .logo i {
-        font-size: 2rem;
-    }
-
-    .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        color: #6c757d;
-        text-decoration: none;
-        border-radius: 8px;
-        margin-bottom: 0.25rem;
-        transition: all 0.2s;
-    }
-
-    .nav-item:hover {
-        background: #f1f3f5;
-        color: #4361ee;
-    }
-
-    .nav-item.active {
-        background: #4361ee;
-        color: white;
-    }
-
-    .nav-item i {
-        width: 20px;
-    }
-
-    /* Main Content */
-    .main {
-        flex: 1;
-        margin-left: 260px;
-        padding: 1.5rem 2rem;
-    }
-
-    /* Header */
-    .top-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        background: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    }
-
-    .page-title h1 {
-        font-size: 1.5rem;
-        font-weight: 600;
-    }
-
-    .page-title p {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-
-    .user-menu {
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-    }
-
-    .notifications {
-        position: relative;
-        cursor: pointer;
-    }
-
-    .notifications i {
-        font-size: 1.25rem;
-        color: #6c757d;
-    }
-
-    .badge {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background: #e63946;
-        color: white;
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 999px;
-        min-width: 18px;
-        height: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        cursor: pointer;
-    }
-
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        background: #4361ee;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-    }
-
-    .user-details {
-        line-height: 1.3;
-    }
-
-    .user-name {
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-
-    .user-role {
-        color: #6c757d;
-        font-size: 0.75rem;
-    }
-
     /* Action Bar */
     .action-bar {
         display: flex;
@@ -309,15 +228,15 @@ include_once '../layouts/header.php';
 
     .product-image {
         width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 1px solid #e9ecef;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #e9ecef;
     }
 
     .product-info {
-    flex: 1;
-}
+        flex: 1;
+    }
 
     .product-info h4 {
         font-weight: 500;
@@ -334,8 +253,8 @@ include_once '../layouts/header.php';
         font-weight: 600;
         color: #4361ee;
         display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+        flex-direction: column;
+        gap: 0.25rem;
     }
 
     .price-info small {
@@ -346,305 +265,310 @@ include_once '../layouts/header.php';
     }
 
     .current-price {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #4361ee;
-}
+        font-size: 1rem;
+        font-weight: 700;
+        color: #4361ee;
+    }
 
-.currency {
-    font-size: 0.75rem;
-    color: #6c757d;
-    margin-left: 0.25rem;
-}
+    .currency {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-left: 0.25rem;
+    }
 
     .product-name-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-}
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
 
-.product-name-wrapper h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #212529;
-    margin: 0;
-}
+    .product-name-wrapper h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #212529;
+        margin: 0;
+    }
 
-.product-sku {
-    font-size: 0.75rem;
-    color: #6c757d;
-}
+    .product-sku {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
 
-/* Stock */
-.stock-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
+    /* Stock */
+    .stock-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
 
-.stock-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    width: fit-content;
-}
+    .stock-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        width: fit-content;
+    }
 
-.stock-badge.normal {
-    background: #d1f7ea;
-    color: #06d6a0;
-}
+    .stock-badge.normal {
+        background: #d1f7ea;
+        color: #06d6a0;
+    }
 
-.stock-badge.low {
-    background: #fff3d1;
-    color: #ffb703;
-}
+    .stock-badge.low {
+        background: #fff3d1;
+        color: #ffb703;
+    }
 
-.stock-badge.critical {
-    background: #ffe5e5;
-    color: #e63946;
-    font-weight: 600;
-    text-transform: uppercase;
-}
+    .stock-badge.critical {
+        background: #ffe5e5;
+        color: #e63946;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 
-.stock-warning {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: #ffb703;
-    font-size: 0.7rem;
-    font-weight: 500;
-    background: #fff3d1;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    width: fit-content;
-}
+    .stock-warning {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #ffb703;
+        font-size: 0.7rem;
+        font-weight: 500;
+        background: #fff3d1;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        width: fit-content;
+    }
 
-.stock-warning i {
-    font-size: 0.6rem;
-    color: #e63946;
-}
+    .stock-warning i {
+        font-size: 0.6rem;
+        color: #e63946;
+    }
 
     .status-badge {
         display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    white-space: nowrap;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
     }
 
     .status-badge i {
-    font-size: 0.5rem;
-}
+        font-size: 0.5rem;
+    }
 
-.status-badge.active {
-    background: #d1f7ea;
-    color: #06d6a0;
-}
+    .status-badge.active {
+        background: #d1f7ea;
+        color: #06d6a0;
+    }
 
-.status-badge.inactive {
-    background: #e9ecef;
-    color: #6c757d;
-}
+    .status-badge.inactive {
+        background: #e9ecef;
+        color: #6c757d;
+    }
 
-.status-badge.exhausted {
-    background: #ffe5e5;
-    color: #e63946;
-}
+    .status-badge.exhausted {
+        background: #ffe5e5;
+        color: #e63946;
+    }
 
-.status-badge.discontinued {
-    background: #fff3d1;
-    color: #ffb703;
-}
+    .status-badge.discontinued {
+        background: #fff3d1;
+        color: #ffb703;
+    }
 
-.status-badge.paused {
-    background: #e1e8ff;
-    color: #4361ee;
-}
+    .status-badge.paused {
+        background: #e1e8ff;
+        color: #4361ee;
+    }
 
-/* Acciones */
+    /* Acciones */
 
     .action-icons {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-}
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
 
-.action-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 6px;
-    background: white;
-    color: #6c757d;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    border: 1px solid #e9ecef;
-}
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 6px;
+        background: white;
+        color: #6c757d;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: 1px solid #e9ecef;
+    }
 
-.action-btn:hover {
-    background: #f8f9fa;
-    transform: translateY(-2px);
-}
+    .action-btn:hover {
+        background: #f8f9fa;
+        transform: translateY(-2px);
+    }
 
-.action-btn.edit:hover {
-    color: #4361ee;
-    border-color: #4361ee;
-}
+    .action-btn.edit:hover {
+        color: #4361ee;
+        border-color: #4361ee;
+    }
 
-.action-btn.copy:hover {
-    color: #06d6a0;
-    border-color: #06d6a0;
-}
+    .action-btn.copy:hover {
+        color: #06d6a0;
+        border-color: #06d6a0;
+    }
 
-.action-btn.delete:hover {
-    color: #e63946;
-    border-color: #e63946;
-}
+    .action-btn.status:hover {
+        color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .action-btn.delete:hover {
+        color: #e63946;
+        border-color: #e63946;
+    }
 
     /* Pagination */
     .pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding: 1rem 0;
-}
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding: 1rem 0;
+    }
 
-.pagination-info {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
+    .pagination-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
 
-.pagination-info strong {
-    color: #4361ee;
-    font-weight: 600;
-}
+    .pagination-info strong {
+        color: #4361ee;
+        font-weight: 600;
+    }
 
-.pagination-controls {
-    display: flex;
-    gap: 0.25rem;
-    align-items: center;
-}
+    .pagination-controls {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
+    }
 
-.page-btn {
-    min-width: 36px;
-    height: 36px;
-    border: 1px solid #e9ecef;
-    background: white;
-    color: #495057;
-    font-size: 0.9rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+    .page-btn {
+        min-width: 36px;
+        height: 36px;
+        border: 1px solid #e9ecef;
+        background: white;
+        color: #495057;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
 
-.page-btn:hover:not(:disabled) {
-    background: #f1f3f5;
-    border-color: #4361ee;
-    color: #4361ee;
-}
+    .page-btn:hover:not(:disabled) {
+        background: #f1f3f5;
+        border-color: #4361ee;
+        color: #4361ee;
+    }
 
-.page-btn.active {
-    background: #4361ee;
-    color: white;
-    border-color: #4361ee;
-}
+    .page-btn.active {
+        background: #4361ee;
+        color: white;
+        border-color: #4361ee;
+    }
 
-.page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-.page-dots {
-    padding: 0 0.5rem;
-    color: #6c757d;
-    font-weight: 500;
-}
+    .page-dots {
+        padding: 0 0.5rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
 
     /* Badge para productos destacados */
     .featured-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    background: #ffd700;
-    color: #000;
-    border-radius: 4px;
-    font-size: 0.7rem;
-}
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 75px;
+        height: 20px;
+        background: #ffd700;
+        color: #181717cc;
+        border-radius: 4px;
+        font-size: 0.7rem;
+    }
 
     /* Badge para descuentos */
     .discount-badge {
         background: #e63946;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    display: inline-block;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
     }
 
     .discount-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
-.original-price {
-    font-size: 0.8rem;
-    color: #adb5bd;
-    text-decoration: line-through;
-}
+    .original-price {
+        font-size: 0.8rem;
+        color: #adb5bd;
+        text-decoration: line-through;
+    }
 
     /* Info de ventas */
     .sales-info {
         display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
     }
 
     .sales-count {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #212529;
-}
+        font-size: 1rem;
+        font-weight: 700;
+        color: #212529;
+    }
 
-.sales-label {
-    font-size: 0.7rem;
-    color: #6c757d;
-}
+    .sales-label {
+        font-size: 0.7rem;
+        color: #6c757d;
+    }
 
     .rating {
-       display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: #f8f9fa;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
     }
 
     .rating i {
-       color: #ffb703;
-    font-size: 0.7rem;
+        color: #ffb703;
+        font-size: 0.7rem;
     }
 
     .rating span {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #495057;
-}
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #495057;
+    }
 
     /* Modal (Crear/Editar Producto) */
     .modal-overlay {
@@ -882,6 +806,24 @@ include_once '../layouts/header.php';
         margin-bottom: 1.5rem;
     }
 
+    .badge-warning {
+        background: #ffc107;
+        color: #212529;
+        border-radius: 25px;
+    }
+
+    .badge-danger {
+        background: #e63946;
+        color: white;
+        border-radius: 25px;
+    }
+
+    .badge-success {
+        background: #4bb543;
+        color: white;
+        border-radius: 25px;
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
         .form-grid {
@@ -928,21 +870,21 @@ include_once '../layouts/header.php';
     }
 
     @media (max-width: 1200px) {
-    .product-cell {
-        min-width: 250px;
-    }
-    
-    .product-image {
-        width: 50px;
-        height: 50px;
-    }
-}
+        .product-cell {
+            min-width: 250px;
+        }
 
-@media (max-width: 992px) {
-    .products-table {
-        min-width: 900px;
+        .product-image {
+            width: 50px;
+            height: 50px;
+        }
     }
-}
+
+    @media (max-width: 992px) {
+        .products-table {
+            min-width: 900px;
+        }
+    }
 </style>
 
 
@@ -952,75 +894,377 @@ include_once '../layouts/header.php';
 <div class="action-bar">
     <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="search-input" placeholder="Buscar producto...">
+        <input type="text"
+            id="buscar"
+            name="buscar"
+            placeholder="Buscar Producto..."
+            value="<?php echo htmlspecialchars($buscar); ?>">
     </div>
     <div class="filters">
-        <select class="filter-select" id="categoria-filter">
-            <option value="">Todas las categorías</option>
-            <option value="ropa">Ropa</option>
-            <option value="calzado">Calzado</option>
-            <option value="accesorios">Accesorios</option>
+        <select class="filter-select select2" id="categoria" name="categoria">
+            <option value="0">Todas las categorías</option>
+            <?php foreach ($categorias as $cat): ?>
+                <option value="<?php echo $cat->id; ?>"
+                    <?php echo $categoria == $cat->id ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($cat->nombre); ?>
+                </option>
+            <?php endforeach; ?>
         </select>
-        <select class="filter-select" id="estado-filter">
+        <select class="filter-select select2" id="subcategoria" name="subcategoria">
+            <option value="0">Todas las categorías</option>
+            <?php foreach ($categorias as $cat): ?>
+                <option value="<?php echo $cat->id; ?>"
+                    <?php echo $categoria == $cat->id ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($cat->nombre); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <select class="filter-select" id="estado" name="estado">
             <option value="">Todos los estados</option>
-            <option value="activo">Activos</option>
-            <option value="inactivo">Inactivos</option>
-            <option value="agotado">Agotados</option>
+            <option value="activo" <?php echo $estado == 'activo' ? 'selected' : ''; ?>>Activos</option>
+            <option value="inactivo" <?php echo $estado == 'inactivo' ? 'selected' : ''; ?>>Inactivos</option>
+            <option value="agotado" <?php echo $estado == 'agotado' ? 'selected' : ''; ?>>Agotados</option>
+            <option value="descontinuado" <?php echo $estado == 'descontinuado' ? 'selected' : ''; ?>>Descontinuado</option>
         </select>
-        <select class="filter-select" id="orden-filter">
-            <option value="">Ordenar por</option>
-            <option value="ventas">Más vendidos</option>
-            <option value="precio_asc">Precio: menor a mayor</option>
-            <option value="precio_desc">Precio: mayor a menor</option>
-            <option value="nuevos">Más recientes</option>
+        <select class="filter-select" id="stock" name="stock">
+            <option value="">Cualquier stock</option>
+            <option value="bajo" <?php echo $stock == 'bajo' ? 'selected' : ''; ?>>Stock bajo (≤5)</option>
+            <option value="critico" <?php echo $stock == 'critico' ? 'selected' : ''; ?>>Stock crítico (≤2)</option>
+            <option value="agotado" <?php echo $stock == 'agotado' ? 'selected' : ''; ?>>Agotado (0)</option>
+            <option value="disponible" <?php echo $stock == 'disponible' ? 'selected' : ''; ?>>Con stock (>0)</option>
+        </select>
+        <select class="filter-select" id="ordenar_por" name="ordenar_por">
+            <option value="fecha_desc" <?php echo $ordenar_por == 'fecha_desc' ? 'selected' : ''; ?>>Más recientes</option>
+            <option value="fecha_asc" <?php echo $ordenar_por == 'fecha_asc' ? 'selected' : ''; ?>>Más antiguos</option>
+            <option value="nombre_asc" <?php echo $ordenar_por == 'nombre_asc' ? 'selected' : ''; ?>>Nombre A-Z</option>
+            <option value="nombre_desc" <?php echo $ordenar_por == 'nombre_desc' ? 'selected' : ''; ?>>Nombre Z-A</option>
+            <option value="precio_asc" <?php echo $ordenar_por == 'precio_asc' ? 'selected' : ''; ?>>Precio menor</option>
+            <option value="precio_desc" <?php echo $ordenar_por == 'precio_desc' ? 'selected' : ''; ?>>Precio mayor</option>
+            <option value="stock_asc" <?php echo $ordenar_por == 'stock_asc' ? 'selected' : ''; ?>>Stock menor</option>
+            <option value="vendidos_desc" <?php echo $ordenar_por == 'vendidos_desc' ? 'selected' : ''; ?>>Más vendidos</option>
         </select>
     </div>
-    <div class="action-buttons">
-        <button class="btn-primary" onclick="openModal()">
-            <i class="fas fa-plus"></i>
-            Nuevo Producto
-        </button>
-        <button class="btn-secondary">
-            <i class="fas fa-download"></i>
-            Importar
-        </button>
-        <button class="btn-secondary">
-            <i class="fas fa-upload"></i>
-            Exportar
-        </button>
+    <div class="col-md-2">
+        <div class="form-group">
+            <label for="destacado">
+                <i class="fas fa-star mr-1"></i>Destacados
+            </label>
+            <select class="form-control" id="destacado" name="destacado">
+                <option value="0">Todos</option>
+                <option value="1" <?php echo $destacado == 1 ? 'selected' : ''; ?>>Solo destacados</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="fecha_desde">
+                <i class="fas fa-calendar-alt mr-1"></i>Fecha desde
+            </label>
+            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"
+                value="<?php echo $fecha_desde; ?>">
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="fecha_hasta">
+                <i class="fas fa-calendar-alt mr-1"></i>Fecha hasta
+            </label>
+            <input type="date" class="form-control" id="fecha_hasta" name="fecha_hasta"
+                value="<?php echo $fecha_hasta; ?>">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <div class="btn-group d-block">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter mr-1"></i> Filtrar
+                </button>
+                <a href="index.php" class="btn btn-secondary">
+                    <i class="fas fa-undo mr-1"></i> Limpiar
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Products Table -->
-<div class="products-table-container">
-    <table class="products-table">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Ventas</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="productos-container">
-            
-            </tr>
-        </tbody>
-    </table>
+<!-- ============================================= -->
+<!-- ESTADÍSTICAS RÁPIDAS -->
+<!-- ============================================= -->
+<div class="col-lg-3 col-6">
+    <div class="small-box bg-info">
+        <div class="inner">
+            <h3><?php echo $stats->total ?? 0; ?></h3>
+            <p>Total productos</p>
+        </div>
+        <div class="icon">
+            <i class="fas fa-box"></i>
+        </div>
+    </div>
+</div>
+<div class="col-lg-3 col-6">
+    <div class="small-box bg-success">
+        <div class="inner">
+            <h3><?php echo $stats->activos ?? 0; ?></h3>
+            <p>Activos</p>
+        </div>
+        <div class="icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+    </div>
+</div>
+<div class="col-lg-3 col-6">
+    <div class="small-box bg-warning">
+        <div class="inner">
+            <h3><?php echo $stats->stock_bajo ?? 0; ?></h3>
+            <p>Stock bajo</p>
+        </div>
+        <div class="icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+    </div>
+</div>
+<div class="col-lg-3 col-6">
+    <div class="small-box bg-danger">
+        <div class="inner">
+            <h3><?php echo $stats->agotados ?? 0; ?></h3>
+            <p>Agotados</p>
+        </div>
+        <div class="icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+    </div>
 </div>
 
-<!-- Pagination -->
-<div class="pagination">
-    <div class="pagination-info">
-        Mostrando 0 - 0 de 0 productos
-    </div>
-    <div class="pagination-controls">
-        <!-- Se llenará con JavaScript -->
+<!-- ============================================= -->
+<!-- TABLA DE PRODUCTOS -->
+<!-- ============================================= -->
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-list mr-2"></i>
+                Listado de Productos
+                <?php if ($total_productos > 0): ?>
+                    <span class="badge-info ml-2"><?php echo $total_productos; ?> encontrados</span>
+                <?php endif; ?>
+            </h3>
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="openModal()">
+                    <i class="fas fa-plus"></i>
+                    Nuevo Producto
+                </button>
+                <button class="btn-secondary">
+                    <i class="fas fa-download"></i>
+                    Importar
+                </button>
+                <button class="btn-secondary">
+                    <i class="fas fa-upload"></i>
+                    Exportar
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <?php if (empty($productos)): ?>
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">No se encontraron productos</h5>
+                    <?php if (!empty($buscar) || $categoria > 0 || $subcategoria > 0 || !empty($estado) || !empty($stock)): ?>
+                        <p class="text-muted">Intenta con otros filtros de búsqueda</p>
+                        <a href="index.php" class="btn btn-primary">
+                            <i class="fas fa-undo mr-1"></i> Limpiar filtros
+                        </a>
+                    <?php else: ?>
+                        <p class="text-muted">Comienza agregando tu primer producto</p>
+                        <a href="crear.php" class="btn btn-primary">
+                            <i class="fas fa-plus mr-1"></i> Crear producto
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th width="40">ID</th>
+                                <th width="60">Imagen</th>
+                                <th>Producto / SKU</th>
+                                <th>Categoría</th>
+                                <th width="100">Precio</th>
+                                <th width="80">Stock</th>
+                                <th width="80">Vendidos</th>
+                                <th width="100">Estado</th>
+                                <th width="120">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($productos as $prod): ?>
+                                
+                                <tr>
+                                    <td><?php echo $prod->id_producto; ?></td>
+                                    <td>
+                                        <img src="../../../Util/Img/Producto/<?php echo $prod->imagen ?? 'producto_default.png'; ?>"
+                                            alt="Producto"
+                                            class="product-image">
+                                    </td>
+                                    <td>
+                                        <strong><?php echo htmlspecialchars($prod->producto); ?></strong>
+                                        <?php if (!empty($prod->sku)): ?>
+                                            <br>
+                                            <small class="text-muted">SKU: <?php echo htmlspecialchars($prod->sku); ?></small>
+                                        <?php endif; ?>
+                                        <?php if ($prod->destacado): ?>
+                                            <br>
+                                            <span class="featured-badge"><i class="fas fa-star"></i>Destacado</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo htmlspecialchars($prod->categoria ?? 'Sin categoría'); ?>
+                                        <?php if (!empty($prod->subcategoria)): ?>
+                                            <br>
+                                            <small class="text-muted"><?php echo htmlspecialchars($prod->subcategoria); ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <strong>$<?php echo number_format($prod->precio, 2); ?></strong>
+                                        <br>
+                                        <small class="text-muted">CUP</small>
+                                    </td>
+                                    <td>
+                                        <?php if ($prod->stock <= 0): ?>
+                                            <span class="stock-badge critical">Agotado</span>
+                                        <?php elseif ($prod->stock <= 10): ?>
+                                            <span class="stock-badge critical"><?php echo $prod->stock; ?> uds</span>
+                                        <?php elseif ($prod->stock <= $prod->stock_minimo): ?>
+                                            <span class="stock-badge low"><?php echo $prod->stock; ?> uds</span>
+                                        <?php else: ?>
+                                            <span class="stock-badge normal"><?php echo $prod->stock; ?> uds</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="badge-info"><?php echo $prod->vendidos ?? 0; ?></span>
+                                    </td>
+                                    <td>
+                                        <?php if ($prod->estado == 'activo'): ?>
+                                            <span class="status-badge active">
+                                                <i class="fas fa-circle"></i>Activo</span>
+                                        <?php elseif ($prod->estado == 'inactivo'): ?>
+                                            <span class="status-badge inactive">
+                                                <i class="fas fa-circle"></i>Inactivo</span>
+                                        <?php elseif ($prod->estado == 'agotado'): ?>
+                                            <span class="status-badge exhausted">
+                                                <i class="fas fa-circle"></i>Agotado</span>
+                                        <?php else: ?>
+                                            <span class="status-badge"><?php echo $prod->estado; ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <div class="action-icons">
+                                            <a href="editar.php?id=<?php echo $prod->id_producto; ?>"
+                                                class="action-btn edit"
+                                                title="Editar"
+                                                data-toggle="tooltip">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="action-btn copy"
+                                                onclick="duplicarProducto(<?php echo $prod->id_producto; ?>)"
+                                                title="Duplicar"
+                                                data-toggle="tooltip">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                            <button class="action-btn status"
+                                                onclick="cambiarEstado(<?php echo $prod->id_producto; ?>)"
+                                                title="Cambiar estado"
+                                                data-toggle="tooltip">
+                                                <i class="fas fa-toggle-on"></i>
+                                            </button>
+                                            <button class="action-btn delete"
+                                                onclick="confirmarEliminar(<?php echo $prod->id_producto; ?>)"
+                                                title="Eliminar"
+                                                data-toggle="tooltip">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- PAGINACIÓN -->
+        <!-- ============================================= -->
+        <?php if ($total_paginas > 1): ?>
+            <div class="card-footer clearfix">
+                <ul class="pagination pagination-sm m-0 float-right">
+
+                    <a class="pagination-controls" href="?<?php echo http_build_query(array_merge($_GET, ['pagina' => $pagina - 1])); ?>" style="text-decoration: none;">
+                        <button class="page-btn" style="display: <?php echo $pagina <= 1 ? 'none' : ''; ?>">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </a>
+
+
+                    <?php
+                    $rango = 5;
+                    $inicio = max(1, $pagina - floor($rango / 2));
+                    $fin = min($total_paginas, $inicio + $rango - 1);
+                    $inicio = max(1, $fin - $rango + 1);
+
+
+                    for ($i = $inicio; $i <= $fin; $i++):
+                    ?>
+
+                        <a class="pagination-controls" href="?<?php echo http_build_query(array_merge($_GET, ['pagina' => $i])); ?>">
+                            <button class="page-btn <?php echo $i == $pagina ? 'active' : ''; ?>">
+                                <?php echo $i; ?>
+                            </button>
+                        </a>
+
+
+                    <?php endfor; ?>
+                    <a class="pagination-controls" href="?<?php echo http_build_query(array_merge($_GET, ['pagina' => $pagina + 1])); ?>">
+                        <button class="page-btn" style="display: <?php echo $pagina == $total_paginas ? 'none' : ''; ?>">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </a>
+                </ul>
+
+                <div class="float-left">
+                    <small class="pagination-info">
+                        Mostrando <?php echo $inicio; ?>-<?php echo $fin; ?> de <?php echo $total_productos; ?> productos
+                        (Página <?php echo $pagina; ?> de <?php echo $total_paginas; ?>)
+                    </small>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
-</main>
+
+
+<!-- Modal para eliminar producto -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este producto?</p>
+                <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Crear/Editar Producto -->
@@ -1194,7 +1438,7 @@ include_once '../layouts/header.php';
 <?php
 include_once '../layouts/footer.php';
 ?>
-<script src="productos.js"></script>
+<!-- <script src="productos.js"></script> -->
 <script>
     function openModal(isEdit = false) {
         document.getElementById('productModal').classList.add('show');
@@ -1213,27 +1457,64 @@ include_once '../layouts/footer.php';
     });
 
     // Simulación de acciones
-    document.querySelectorAll('.action-icons button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (btn.classList.contains('delete')) {
-                if (confirm('¿Estás seguro de eliminar este producto?')) {
-                    alert('Producto eliminado (demo)');
-                }
-            } else if (btn.querySelector('.fa-edit')) {
-                openModal(true);
-            } else if (btn.querySelector('.fa-copy')) {
-                alert('Producto duplicado (demo)');
-            }
-        });
-    });
-
-    // Navegación
-    // document.querySelectorAll('.nav-item').forEach(item => {
-    //     item.addEventListener('click', (e) => {
-    //         e.preventDefault();
-    //         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    //         item.classList.add('active');
+    // document.querySelectorAll('.action-icons button').forEach(btn => {
+    //     btn.addEventListener('click', (e) => {
+    //         e.stopPropagation();
+    //         if (btn.classList.contains('delete')) {
+    //             if (confirm('¿Estás seguro de eliminar este producto?')) {
+    //                 alert('Producto eliminado (demo)');
+    //             }
+    //         } else if (btn.querySelector('.fa-edit')) {
+    //             openModal(true);
+    //         } else if (btn.querySelector('.fa-copy')) {
+    //             alert('Producto duplicado (demo)');
+    //         }
     //     });
     // });
+
+
+    // ==========================
+    // Scripts Para las Funciones
+    // ==========================
+    // Variables globales para JS
+    var id_tienda = <?php echo $id_tienda; ?>;
+
+    $(document).ready(function() {
+        // Inicializar tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Inicializar Select2 para mejor experiencia
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Seleccionar...'
+        });
+
+        // Validar fechas (hasta no puede ser menor que desde)
+        $('#fecha_desde, #fecha_hasta').change(function() {
+            var desde = $('#fecha_desde').val();
+            var hasta = $('#fecha_hasta').val();
+
+            if (desde && hasta && hasta < desde) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Fechas inválidas',
+                    text: 'La fecha "hasta" debe ser mayor o igual a la fecha "desde"'
+                });
+                $('#fecha_hasta').val('');
+            }
+        });
+
+        // Preservar filtros al cambiar página
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            var url = new URL(window.location.href);
+            var params = new URLSearchParams(url.search);
+
+            // Actualizar página
+            var href = new URL($(this).attr('href'), window.location.origin);
+            params.set('pagina', href.searchParams.get('pagina'));
+
+            window.location.href = url.pathname + '?' + params.toString();
+        });
+    });
 </script>
