@@ -62,8 +62,7 @@ class Producto
             JOIN subcategoria sc ON p.id_subcategoria = sc.id
             JOIN categoria c ON sc.id_categoria = c.id
             WHERE pt.id = :id 
-            AND pt.estado = 'activo' 
-            AND p.estado = 'activo'";
+            AND pt.estado = 'activo'";
 
             $query = $this->acceso->prepare($sql);
             $query->execute(array(':id' => $id));
@@ -109,8 +108,7 @@ class Producto
             JOIN subcategoria sc ON p.id_subcategoria = sc.id
             JOIN categoria c ON sc.id_categoria = c.id
             WHERE t.id = :id_tienda 
-            AND pt.estado = 'activo' 
-            AND p.estado = 'activo'";
+            AND pt.estado = 'activo'";
 
             $query = $this->acceso->prepare($sql);
             $query->execute(array(':id_tienda' => $id_tienda));
@@ -153,8 +151,7 @@ class Producto
             JOIN subcategoria sc ON p.id_subcategoria = sc.id
             JOIN categoria c ON sc.id_categoria = c.id
             WHERE p.id_subcategoria = :id_subcategoria
-            AND pt.estado = 'activo'
-            AND p.estado = 'activo'";
+            AND pt.estado = 'activo'";
 
             if ($filtro_nuevos) {
                 $sql .= " AND DATEDIFF(NOW(), pt.fecha_creacion) <= 7";
@@ -218,8 +215,7 @@ class Producto
             JOIN tienda t ON t.id = pt.id_tienda
             JOIN subcategoria sc ON p.id_subcategoria = sc.id
             JOIN categoria c ON sc.id_categoria = c.id
-            WHERE pt.estado = 'activo'
-            AND p.estado = 'activo'";
+            WHERE pt.estado = 'activo'";
 
             if ($filtro_nuevos) {
                 $sql .= " AND DATEDIFF(NOW(), pt.fecha_creacion) <= 7";
@@ -289,8 +285,7 @@ class Producto
             JOIN subcategoria sc ON p.id_subcategoria = sc.id
             JOIN categoria c ON sc.id_categoria = c.id
             WHERE sc.id_categoria = :id_categoria
-            AND pt.estado = 'activo'
-            AND p.estado = 'activo'";
+            AND pt.estado = 'activo''";
 
         if ($filtro_nuevos) {
             $sql .= " AND DATEDIFF(NOW(), pt.fecha_creacion) <= 7";
@@ -352,8 +347,7 @@ class Producto
             JOIN tienda t ON t.id = pt.id_tienda
             JOIN subcategoria sc ON p.id_subcategoria = sc.id
             JOIN categoria c ON sc.id_categoria = c.id
-            WHERE pt.estado = 'activo'
-            AND p.estado = 'activo'";
+            WHERE pt.estado = 'activo'";
 
         $params = array();
 
@@ -423,7 +417,7 @@ class Producto
                 m.nombre as marca,
                 pt.envio_gratis as envio,
                 pt.total_ventas as ventas,
-                p.estado as estado,
+                pt.estado as estado,
                 pt.garantia_meses as garantia,
                 pt.tiempo_entrega as entrega,
                 pt.precio as precio,
@@ -489,7 +483,7 @@ class Producto
                 m.nombre as marca,
                 pt.envio_gratis as envio,
                 pt.total_ventas as ventas,
-                p.estado as estado,
+                pt.estado as estado,
                 pt.garantia_meses as garantia,
                 pt.tiempo_entrega as entrega,
                 pt.precio as precio,
@@ -539,7 +533,7 @@ class Producto
         
         // Filtro por estado
         if (!empty($filtros['estado'])) {
-            $sql .= " AND p.estado = :estado";
+            $sql .= " AND pt.estado = :estado";
             $params[':estado'] = $filtros['estado'];
         }
         
@@ -547,10 +541,10 @@ class Producto
         if (!empty($filtros['stock'])) {
             switch ($filtros['stock']) {
                 case 'bajo':
-                    $sql .= " AND pt.stock > 0 AND p.stock <= 5";
+                    $sql .= " AND pt.stock > 0 AND pt.stock <= 5";
                     break;
                 case 'critico':
-                    $sql .= " AND pt.stock > 0 AND p.stock <= 2";
+                    $sql .= " AND pt.stock > 0 AND pt.stock <= 2";
                     break;
                 case 'agotado':
                     $sql .= " AND pt.stock <= 0";
@@ -568,12 +562,12 @@ class Producto
         
         // Filtro por fechas
         if (!empty($filtros['fecha_desde'])) {
-            $sql .= " AND DATE(p.fecha_creacion) >= :fecha_desde";
+            $sql .= " AND DATE(pt.fecha_creacion) >= :fecha_desde";
             $params[':fecha_desde'] = $filtros['fecha_desde'];
         }
         
         if (!empty($filtros['fecha_hasta'])) {
-            $sql .= " AND DATE(p.fecha_creacion) <= :fecha_hasta";
+            $sql .= " AND DATE(pt.fecha_creacion) <= :fecha_hasta";
             $params[':fecha_hasta'] = $filtros['fecha_hasta'];
         }
         
@@ -581,6 +575,9 @@ class Producto
         switch ($filtros['ordenar_por']) {
             case 'fecha_asc':
                 $sql .= " ORDER BY p.fecha_creacion ASC";
+                break;
+            case 'fecha_desc':
+                $sql .= " ORDER BY pt.fecha_creacion DESC";
                 break;
             case 'nombre_asc':
                 $sql .= " ORDER BY p.nombre ASC";
@@ -601,15 +598,15 @@ class Producto
                 $sql .= " ORDER BY pt.total_ventas DESC";
                 break;
             default: // fecha_desc
-                $sql .= " ORDER BY p.fecha_creacion DESC";
+                $sql .= " ORDER BY p.id ASC";
                 break;
         }
         
         // Paginación
         if (isset($filtros['limite'])) {
             $sql .= " LIMIT :limite OFFSET :offset";
-            $params[':limite'] = $filtros['limite'];
-            $params[':offset'] = $filtros['offset'];
+            $params[':limite'] = (int)$filtros['limite'];
+            $params[':offset'] = (int)$filtros['offset'];
         }
         
         $query = $this->acceso->prepare($sql);
@@ -633,8 +630,8 @@ class Producto
      */
     function contar_por_tienda_con_filtros($filtros) {
         $sql = "SELECT COUNT(*) as total 
-                FROM producto p
-                LEFT JOIN producto_tienda pt ON p.id = pt.id_producto
+                FROM producto_tienda pt
+                JOIN producto p ON p.id = pt.id_producto
                 JOIN subcategoria sc ON p.id_subcategoria = sc.id
                 JOIN categoria c ON sc.id_categoria = c.id
                 WHERE pt.id_tienda = :id_tienda";
@@ -658,17 +655,17 @@ class Producto
         }
         
         if (!empty($filtros['estado'])) {
-            $sql .= " AND p.estado = :estado";
+            $sql .= " AND pt.estado = :estado";
             $params[':estado'] = $filtros['estado'];
         }
         
         if (!empty($filtros['stock'])) {
             switch ($filtros['stock']) {
                 case 'bajo':
-                    $sql .= " AND pt.stock > 0 AND p.stock <= 5";
+                    $sql .= " AND pt.stock > 0 AND pt.stock <= 5";
                     break;
                 case 'critico':
-                    $sql .= " AND pt.stock > 0 AND p.stock <= 2";
+                    $sql .= " AND pt.stock > 0 AND pt.stock <= 2";
                     break;
                 case 'agotado':
                     $sql .= " AND pt.stock <= 0";
@@ -684,19 +681,19 @@ class Producto
         }
         
         if (!empty($filtros['fecha_desde'])) {
-            $sql .= " AND DATE(p.fecha_creacion) >= :fecha_desde";
+            $sql .= " AND DATE(pt.fecha_creacion) >= :fecha_desde";
             $params[':fecha_desde'] = $filtros['fecha_desde'];
         }
         
         if (!empty($filtros['fecha_hasta'])) {
-            $sql .= " AND DATE(p.fecha_creacion) <= :fecha_hasta";
+            $sql .= " AND DATE(pt.fecha_creacion) <= :fecha_hasta";
             $params[':fecha_hasta'] = $filtros['fecha_hasta'];
         }
         
         $query = $this->acceso->prepare($sql);
         $query->execute($params);
         $resultado = $query->fetch(PDO::FETCH_OBJ);
-        return $resultado->total;
+         return $resultado ? (int)$resultado->total : 0;
     }
 
     /**
@@ -705,17 +702,29 @@ class Producto
     function obtener_estadisticas_tienda($id_tienda) {
         $sql = "SELECT 
                     COUNT(*) as total,
-                    SUM(CASE WHEN p.estado = 'activo' THEN 1 ELSE 0 END) as activos,
-                    SUM(CASE WHEN p.estado = 'inactivo' THEN 1 ELSE 0 END) as inactivos,
+                    SUM(CASE WHEN pt.estado = 'activo' THEN 1 ELSE 0 END) as activos,
+                    SUM(CASE WHEN pt.estado = 'inactivo' THEN 1 ELSE 0 END) as inactivos,
                     SUM(CASE WHEN pt.stock <= 5 AND stock > 0 THEN 1 ELSE 0 END) as stock_bajo,
                     SUM(CASE WHEN pt.stock <= 0 THEN 1 ELSE 0 END) as agotados,
                     SUM(CASE WHEN pt.es_destacado = 1 THEN 1 ELSE 0 END) as destacados
                 FROM producto_tienda pt
-                LEFT JOIN producto p ON p.id = pt.id_producto
                 WHERE pt.id_tienda = :id_tienda";
         
         $query = $this->acceso->prepare($sql);
         $query->execute([':id_tienda' => $id_tienda]);
         return $query->fetch(PDO::FETCH_OBJ);
+
+        // Asegurar valores por defecto
+        if (!$resultado) {
+            $resultado = new stdClass();
+            $resultado->total = 0;
+            $resultado->activos = 0;
+            $resultado->inactivos = 0;
+            $resultado->stock_bajo = 0;
+            $resultado->agotados = 0;
+            $resultado->destacados = 0;
+        }
+
+         return $resultado;
     }
 }
