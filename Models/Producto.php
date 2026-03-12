@@ -1,6 +1,6 @@
 <?php
 include_once 'Conexion.php';
-
+error_log("========== Producto.php cargado ==========");
 class Producto
 {
     var $objetos;
@@ -475,7 +475,7 @@ class Producto
                 pt.id as id,
                 p.id as id_producto,
                 p.nombre as producto,
-                p.caracteristicas as caracteristicas,
+                pt.total_ventas as vendidos,
                 p.sku as sku,
                 COALESCE(pi.imagen_url, 'producto_default.png') as imagen,
                 p.descripcion_larga as detalles,
@@ -572,35 +572,40 @@ class Producto
         }
         
         // Ordenamiento
-        switch ($filtros['ordenar_por']) {
-            case 'fecha_asc':
-                $sql .= " ORDER BY p.fecha_creacion ASC";
-                break;
-            case 'fecha_desc':
-                $sql .= " ORDER BY pt.fecha_creacion DESC";
-                break;
-            case 'nombre_asc':
-                $sql .= " ORDER BY p.nombre ASC";
-                break;
-            case 'nombre_desc':
-                $sql .= " ORDER BY p.nombre DESC";
-                break;
-            case 'precio_asc':
-                $sql .= " ORDER BY pt.precio ASC";
-                break;
-            case 'precio_desc':
-                $sql .= " ORDER BY pt.precio DESC";
-                break;
-            case 'stock_asc':
-                $sql .= " ORDER BY pt.stock ASC";
-                break;
-            case 'vendidos_desc':
-                $sql .= " ORDER BY pt.total_ventas DESC";
-                break;
-            default: // fecha_desc
-                $sql .= " ORDER BY p.id ASC";
-                break;
-        }
+        if (isset($filtros['ordenar_por']) && !empty($filtros['ordenar_por'])) {
+    switch ($filtros['ordenar_por']) {
+        case 'fecha_asc':
+            $sql .= " ORDER BY pt.fecha_creacion ASC";
+            break;
+        case 'fecha_desc':
+            $sql .= " ORDER BY pt.fecha_creacion DESC";
+            break;
+        case 'nombre_asc':
+            $sql .= " ORDER BY p.nombre ASC";
+            break;
+        case 'nombre_desc':
+            $sql .= " ORDER BY p.nombre DESC";
+            break;
+        case 'precio_asc':
+            $sql .= " ORDER BY pt.precio ASC";
+            break;
+        case 'precio_desc':
+            $sql .= " ORDER BY pt.precio DESC";
+            break;
+        case 'stock_asc':
+            $sql .= " ORDER BY pt.stock ASC";
+            break;
+        case 'vendidos_desc':
+            $sql .= " ORDER BY pt.total_ventas DESC";
+            break;
+        default:
+            $sql .= " ORDER BY pt.fecha_creacion DESC";
+            break;
+    }
+} else {
+    // Si no hay ordenamiento definido, usar fecha por defecto
+    $sql .= " ORDER BY pt.fecha_creacion DESC";
+}
         
         // Paginación
         if (isset($filtros['limite'])) {
@@ -621,8 +626,11 @@ class Producto
         }
         
         $query->execute();
-        $this->objetos = $query->fetchAll(PDO::FETCH_OBJ);
-        return $this->objetos;
+    $resultados = $query->fetchAll(PDO::FETCH_OBJ);
+    
+    // Siempre devolver un array, aunque esté vacío
+    $this->objetos = is_array($resultados) ? $resultados : [];
+    return $this->objetos;
     }
 
     /**
@@ -632,8 +640,8 @@ class Producto
         $sql = "SELECT COUNT(*) as total 
                 FROM producto_tienda pt
                 JOIN producto p ON p.id = pt.id_producto
-                JOIN subcategoria sc ON p.id_subcategoria = sc.id
-                JOIN categoria c ON sc.id_categoria = c.id
+                LEFT JOIN subcategoria sc ON p.id_subcategoria = sc.id
+                LEFT JOIN categoria c ON sc.id_categoria = c.id
                 WHERE pt.id_tienda = :id_tienda";
         
         $params = [':id_tienda' => $filtros['id_tienda']];
@@ -693,7 +701,8 @@ class Producto
         $query = $this->acceso->prepare($sql);
         $query->execute($params);
         $resultado = $query->fetch(PDO::FETCH_OBJ);
-         return $resultado ? (int)$resultado->total : 0;
+        
+        return $resultado ? (int)$resultado->total : 0;
     }
 
     /**
@@ -704,7 +713,7 @@ class Producto
                     COUNT(*) as total,
                     SUM(CASE WHEN pt.estado = 'activo' THEN 1 ELSE 0 END) as activos,
                     SUM(CASE WHEN pt.estado = 'inactivo' THEN 1 ELSE 0 END) as inactivos,
-                    SUM(CASE WHEN pt.stock <= 5 AND stock > 0 THEN 1 ELSE 0 END) as stock_bajo,
+                    SUM(CASE WHEN pt.stock <= 5 AND pt.stock > 0 THEN 1 ELSE 0 END) as stock_bajo,
                     SUM(CASE WHEN pt.stock <= 0 THEN 1 ELSE 0 END) as agotados,
                     SUM(CASE WHEN pt.es_destacado = 1 THEN 1 ELSE 0 END) as destacados
                 FROM producto_tienda pt
@@ -712,7 +721,7 @@ class Producto
         
         $query = $this->acceso->prepare($sql);
         $query->execute([':id_tienda' => $id_tienda]);
-        return $query->fetch(PDO::FETCH_OBJ);
+        $resultado = $query->fetch(PDO::FETCH_OBJ);
 
         // Asegurar valores por defecto
         if (!$resultado) {
